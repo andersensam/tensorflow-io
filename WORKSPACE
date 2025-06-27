@@ -209,7 +209,9 @@ tf_configure(name = "local_config_tf")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
-http_archive(
+load("@org_tensorflow//third_party:repo.bzl", "tf_http_archive", "tf_mirror_urls")
+
+tf_http_archive(
     name = "com_github_grpc_grpc",
     sha256 = "b956598d8cbe168b5ee717b5dafa56563eb5201a947856a6688bbeac9cac4e1f",
     strip_prefix = "grpc-b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd",
