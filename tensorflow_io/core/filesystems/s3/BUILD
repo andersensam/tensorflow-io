@@ -23,7 +23,7 @@ cc_library(
         "@aws-sdk-cpp//:transfer",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/synchronization",
-        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:tsl_status",
+        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
     ],
     alwayslink = 1,
 )
