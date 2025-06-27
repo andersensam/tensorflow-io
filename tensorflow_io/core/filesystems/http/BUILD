@@ -20,7 +20,7 @@ cc_library(
         "@com_google_absl//absl/synchronization",
         "@com_google_absl//absl/time",
         "@curl",
-        "@tsl//tsl/platform:tsl_status",
+        "@org_tensorflow//third_party/xla/third_party/tsl/platform:tsl_status",
     ],
     alwayslink = 1,
 )
