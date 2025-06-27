@@ -130,7 +130,7 @@ python_register_toolchains(
 http_archive(
     name = "tsl",
     build_file = "//third_party:tsl.BUILD",
-    sha256 = "9b445df7f7e0568264dee8f74237119b470e7f774f80c173d8374ff8b37b900b3",
+    sha256 = "9b445df7f7e0568264dee8f74237119b470e7f774f80c173d8374ff8b37b900b",
     strip_prefix = "tsl-main",
     url = "https://github.com/andersensam/tsl/archive/refs/heads/main.zip",
 )
