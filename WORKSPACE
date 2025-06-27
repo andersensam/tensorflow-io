@@ -100,32 +100,39 @@ http_archive(
     ],
 )
 
-http_archive(
-    name = "rules_python",
-    sha256 = "62ddebb766b4d6ddf1712f753dac5740bea072646f630eb9982caa09ad8a7687",
-    strip_prefix = "rules_python-0.39.0",
-    url = "https://github.com/bazel-contrib/rules_python/releases/download/0.39.0/rules_python-0.39.0.tar.gz",
+load("@org_tensorflow//third_party/xla/third_party/py:python_init_rules.bzl", "python_init_rules")
+
+python_init_rules()
+
+load("@org_tensorflow//third_party/xla/third_party/py:python_init_repositories.bzl", "python_init_repositories")
+
+python_init_repositories(
+    default_python_version = "system",
+    local_wheel_dist_folder = "dist",
+    local_wheel_inclusion_list = [
+        "tensorflow*",
+        "tf_nightly*",
+    ],
+    local_wheel_workspaces = ["@org_tensorflow//:WORKSPACE"],
+    requirements = {
+        "3.9": "@org_tensorflow//:requirements_lock_3_9.txt",
+        "3.10": "@org_tensorflow//:requirements_lock_3_10.txt",
+        "3.11": "@org_tensorflow//:requirements_lock_3_11.txt",
+        "3.12": "@org_tensorflow//:requirements_lock_3_12.txt",
+    },
 )
 
-load("@rules_python//python:repositories.bzl", "py_repositories")
+load("@org_tensorflow//third_party/xla/third_party/py:python_init_toolchains.bzl", "python_init_toolchains")
 
-py_repositories()
+python_init_toolchains()
 
-load("@rules_python//python:repositories.bzl", "python_register_toolchains")
-load(
-    "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
-    "python_repository"
-)
+load("@org_tensorflow//third_party/xla/third_party/py:python_init_pip.bzl", "python_init_pip")
 
-python_repository(name = "python_version_repo_tf")
+python_init_pip()
 
-load("@python_version_repo_tf//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
+load("@pypi//:requirements.bzl", "install_deps")
 
-python_register_toolchains(
-    name = "python",
-    ignore_root_user_error = True,
-    python_version = HERMETIC_PYTHON_VERSION
-)
+install_deps()
 
 http_archive(
     name = "tsl",
