@@ -229,7 +229,7 @@ tf_http_archive(
         "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
         "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
     },
-    url = "https://github.com/grpc/grpc/archive/b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd.tar.gz"
+    urls = tf_mirror_urls()"https://github.com/grpc/grpc/archive/b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd.tar.gz")
 )
 
 http_archive(
