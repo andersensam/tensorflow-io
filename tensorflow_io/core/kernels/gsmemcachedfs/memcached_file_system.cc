@@ -27,7 +27,7 @@ limitations under the License.
 #ifdef _WIN32
 #include <io.h>  // for _mktemp
 #endif
-#include "xla/tsl/platform/cloud/ram_file_block_cache.h"
+#include "tsl/platform/cloud/ram_file_block_cache.h"
 
 #ifdef _WIN32
 #ifdef DeleteFile

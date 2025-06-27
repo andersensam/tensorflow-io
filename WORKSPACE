@@ -93,18 +93,18 @@ switched_rules_by_language(
 
 http_archive(
     name = "org_tensorflow",
-    sha256 = "4691b18e8c914cdf6759b80f1b3b7f3e17be41099607ed0143134f38836d058e",
-    strip_prefix = "tensorflow-2.19.0",
+    sha256 = "c5a52685b88481fdbb064fdd77eac48870197fe5a68b87da06bd3e4311527035",
+    strip_prefix = "tensorflow-r2.19",
     urls = [
-        "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.19.0.tar.gz",
+        "https://github.com/andersensam/tensorflow/archive/refs/heads/r2.19.zip",
     ],
 )
 
 http_archive(
     name = "rules_python",
-    sha256 = "c68bdc4fbec25de5b5493b8819cfc877c4ea299c0dcb15c244c5a00208cde311",
-    strip_prefix = "rules_python-0.31.0",
-    url = "https://github.com/bazelbuild/rules_python/releases/download/0.31.0/rules_python-0.31.0.tar.gz",
+    sha256 = "690e0141724abb568267e003c7b6d9a54925df40c275a870a4d934161dc9dd53",
+    strip_prefix = "rules_python-0.40.0",
+    url = "https://github.com/bazel-contrib/rules_python/releases/download/0.40.0/rules_python-0.40.0.tar.gz",
 )
 
 load("@rules_python//python:repositories.bzl", "py_repositories")
@@ -125,6 +125,14 @@ python_register_toolchains(
     name = "python",
     ignore_root_user_error = True,
     python_version = HERMETIC_PYTHON_VERSION,
+)
+
+http_archive(
+    name = "tsl",
+    build_file = "//third_party:tsl.BUILD",
+    sha256 = "9b445df7f7e0568264dee8f74237119b470e7f774f80c173d8374ff8b37b900b3",
+    strip_prefix = "tsl-main",
+    url = "https://github.com/andersensam/tsl/archive/refs/heads/main.zip",
 )
 
 load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
