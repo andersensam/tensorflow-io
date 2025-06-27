@@ -122,7 +122,7 @@ python_repository(name = "python_version_repo_tf")
 load("@python_version_repo_tf//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
 
 python_register_toolchains(
-    name = "python_local",
+    name = "python",
     ignore_root_user_error = True,
     python_version = HERMETIC_PYTHON_VERSION,
 )
@@ -137,7 +137,7 @@ python_repository(name = "python_version_repo")
 load("@python_version_repo//:py_version.bzl", "USE_PYWRAP_RULES")
 
 python_register_toolchains(
-    name = "python",
+    name = "python_pywrap",
     ignore_root_user_error = True,
     use_pywrap_rules = USE_PYWRAP_RULES
 )
