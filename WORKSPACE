@@ -113,19 +113,18 @@ py_repositories()
 
 load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 load(
-    "@org_tensorflow//third_party/py:python_repo.bzl",
-    "python_repository",
+    "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
+    "python_repository_local",
 )
 
-python_repository(name = "python_version_repo")
+python_repository_local(name = "python_version_repo_local")
 
-load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION", "USE_PYWRAP_RULES")
+load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
 
 python_register_toolchains(
-    name = "python",
+    name = "python_local",
     ignore_root_user_error = True,
     python_version = HERMETIC_PYTHON_VERSION,
-    use_pywrap_rules = USE_PYWRAP_RULES
 )
 
 http_archive(
