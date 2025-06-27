@@ -9,7 +9,7 @@ http_archive(
     build_file = "//third_party:zlib.BUILD",
     sha256 = "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23",
     strip_prefix = "zlib-1.3.1",
-    #system_build_file = "@local_tsl//third_party/systemlibs:zlib.BUILD",
+    #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:zlib.BUILD",
     url = "https://zlib.net/zlib-1.3.1.tar.gz"
 )
 
@@ -208,6 +208,27 @@ load("//third_party/toolchains/tf:tf_configure.bzl", "tf_configure")
 tf_configure(name = "local_config_tf")
 
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
+
+http_archive(
+    name = "com_github_grpc_grpc",
+    sha256 = "b956598d8cbe168b5ee717b5dafa56563eb5201a947856a6688bbeac9cac4e1f",
+    strip_prefix = "grpc-b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd",
+    #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
+    patch_file = [
+        "@org_tensorflow//third_party/xla/third_party/grpc:generate_cc_env_fix.patch",
+        "@org_tensorflow//third_party/xla/third_party/grpc:register_go_toolchain.patch",
+    ],
+    system_link_files = {
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:BUILD": "bazel/BUILD",
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD": "src/compiler/BUILD",
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.grpc_deps.bzl": "bazel/grpc_deps.bzl",
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.grpc_extra_deps.bzl": "bazel/grpc_extra_deps.bzl",
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.cc_grpc_library.bzl": "bazel/cc_grpc_library.bzl",
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
+        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
+    },
+    url = "https://github.com/grpc/grpc/archive/b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd.tar.gz"
+)
 
 http_archive(
     name = "lmdb",
