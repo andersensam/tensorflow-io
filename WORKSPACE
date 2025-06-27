@@ -128,7 +128,7 @@ load(
 
 python_repository(name = "python_version_repo")
 
-load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION", "USE_PYWRAP_RULES")
+load("@python_version_repo//:py_version.bzl", "USE_PYWRAP_RULES")
 
 python_register_toolchains(
     name = "python_local",
