@@ -82,7 +82,7 @@ cc_library(
 cc_library(
     name = "tf_tsl_header_lib",
     hdrs = [":tf_tsl_header_include"],
-    include_prefix = "tensorflow/tsl/c",
+    include_prefix = "tsl/platform",
     strip_include_prefix = "include_tsl",
     visibility = ["//visibility:public"],
 )

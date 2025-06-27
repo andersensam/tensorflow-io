@@ -7,7 +7,8 @@
 
 #include "absl/memory/memory.h"
 #include "tensorflow/core/lib/core/status.h"
-#include "tensorflow/tsl/platform/cloud/compute_engine_metadata_client.h"
+#include "xla/tsl/platform/cloud/compute_engine_metadata_client.h"
+#include "tensorflow/tsl/platform/str_util.h"
 
 namespace tensorflow {
 

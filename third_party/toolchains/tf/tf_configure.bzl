@@ -184,7 +184,7 @@ def _tf_pip_impl(repository_ctx):
     )
     tf_tsl_header_rule = _symlink_genrule_for_dir(
         repository_ctx,
-        tf_header_dir + "/tensorflow/tsl/c/",
+        tf_header_dir + "/tsl/platform/",
         "include_tsl",
         "tf_tsl_header_include",
     )
