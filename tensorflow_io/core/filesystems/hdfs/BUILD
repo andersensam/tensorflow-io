@@ -19,7 +19,7 @@ cc_library(
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/synchronization",
         "@hadoop",
-        "@org_tensorflow//third_party/xla/third_party/tsl/platform:tsl_status",
+        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:tsl_status",
     ],
     alwayslink = 1,
 )

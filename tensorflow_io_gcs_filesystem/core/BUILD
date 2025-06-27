@@ -37,7 +37,7 @@ cc_library(
         "@com_google_absl//absl/types:variant",
         "@local_config_tf//:tf_c_header_lib",
         "@local_config_tf//:tf_tsl_header_lib",
-        "@org_tensorflow//third_party/xla/third_party/tsl/platform:tsl_status",
+        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:tsl_status",
     ],
     alwayslink = 1,
 )
