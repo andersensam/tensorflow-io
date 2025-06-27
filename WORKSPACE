@@ -217,17 +217,17 @@ tf_http_archive(
     strip_prefix = "grpc-b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd",
     #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
     patch_file = [
-        "@org_tensorflow//third_party/xla/third_party/grpc:generate_cc_env_fix.patch",
-        "@org_tensorflow//third_party/xla/third_party/grpc:register_go_toolchain.patch",
+        "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
+        "@org_tensorflow//third_party/grpc:register_go_toolchain.patch",
     ],
     system_link_files = {
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:BUILD": "bazel/BUILD",
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD": "src/compiler/BUILD",
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.grpc_deps.bzl": "bazel/grpc_deps.bzl",
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.grpc_extra_deps.bzl": "bazel/grpc_extra_deps.bzl",
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.cc_grpc_library.bzl": "bazel/cc_grpc_library.bzl",
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
-        "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
+        "@org_tensorflow//third_party/systemlibs:BUILD": "bazel/BUILD",
+        "@org_tensorflow//third_party/systemlibs:grpc.BUILD": "src/compiler/BUILD",
+        "@org_tensorflow//third_party/systemlibs:grpc.bazel.grpc_deps.bzl": "bazel/grpc_deps.bzl",
+        "@org_tensorflow//third_party/systemlibs:grpc.bazel.grpc_extra_deps.bzl": "bazel/grpc_extra_deps.bzl",
+        "@org_tensorflow//third_party/systemlibs:grpc.bazel.cc_grpc_library.bzl": "bazel/cc_grpc_library.bzl",
+        "@org_tensorflow//third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
+        "@org_tensorflow//third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
     },
     urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd.tar.gz")
 )
