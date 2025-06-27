@@ -114,7 +114,8 @@ py_repositories()
 load("@rules_python//python:repositories.bzl", "python_register_toolchains")
 load(
     "@org_tensorflow//tensorflow/tools/toolchains/python:python_repo.bzl",
-    "python_repository_local",
+    "python_repository",
+    name = "python_repository_local"
 )
 
 python_repository_local(name = "python_version_repo_local")
