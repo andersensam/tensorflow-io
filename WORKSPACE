@@ -120,7 +120,7 @@ load(
 
 python_repository_local(name = "python_version_repo_local")
 
-load("@python_version_repo//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
+load("@python_version_repo_local//:py_version.bzl", "HERMETIC_PYTHON_VERSION")
 
 python_register_toolchains(
     name = "python_local",
