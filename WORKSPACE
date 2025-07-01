@@ -251,10 +251,10 @@ http_archive(
 http_archive(
     name = "arrow",
     build_file = "//third_party:arrow.BUILD",
-    sha256 = "6e283edb7b6c2a27909a8db6fe0eeba94a6678f70d9c261f11419161d71c0a92",
+    sha256 = "89efbbf852f5a1f79e9c99ab4c217e2eb7f991837c005cba2d4a2fbd35fad212",
     strip_prefix = "apache-arrow-20.0.0",
     urls = [
-        "https://github.com/apache/arrow/releases/download/apache-arrow-20.0.0-rc0/apache-arrow-20.0.0.tar.gz",
+        "https://github.com/apache/arrow/releases/download/apache-arrow-20.0.0/apache-arrow-20.0.0.tar.gz",
     ],
 )
 
