@@ -25,18 +25,13 @@ http_archive(
     ],
 )
 
-# Note: boringssl is placed earlier as boringssl needs to be patched for mongodb
+
+
 http_archive(
     name = "boringssl",
-    patch_cmds = [
-        """sed -i.bak 's/bio.c",/bio.c","src\\/decrepit\\/bio\\/base64_bio.c",/g' BUILD.generated.bzl""",
-    ],
-    sha256 = "a9c3b03657d507975a32732f04563132b4553c20747cec6dc04de475c8bdf29f",
-    strip_prefix = "boringssl-80ca9f9f6ece29ab132cce4cf807a9465a18cfac",
-    urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
-        "https://github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
-    ],
+    sha256 = "9dc53f851107eaf87b391136d13b815df97ec8f76dadb487b58b2fc45e624d2c",
+    strip_prefix = "boringssl-c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc",
+    url = "https://github.com/google/boringssl/archive/c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz",
 )
 
 # Note google_cloud_cpp is placed earlier as tensorflow's version is older
@@ -256,10 +251,10 @@ http_archive(
 http_archive(
     name = "arrow",
     build_file = "//third_party:arrow.BUILD",
-    sha256 = "2f28ead4acd0e2b519b7c41087e09eca8c12e212e9a3c01c714274549dc6c824",
-    strip_prefix = "arrow-apache-arrow-14.0.1.dev",
+    sha256 = "6e283edb7b6c2a27909a8db6fe0eeba94a6678f70d9c261f11419161d71c0a92",
+    strip_prefix = "apache-arrow-20.0.0",
     urls = [
-        "https://github.com/apache/arrow/archive/refs/tags/apache-arrow-14.0.1.dev.tar.gz",
+        "https://github.com/apache/arrow/releases/download/apache-arrow-20.0.0-rc0/apache-arrow-20.0.0.tar.gz",
     ],
 )
 
