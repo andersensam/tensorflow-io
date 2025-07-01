@@ -325,13 +325,10 @@ http_archive(
 http_archive(
     name = "boost",
     build_file = "//third_party:boost.BUILD",
-    sha256 = "c66e88d5786f2ca4dbebb14e06b566fb642a1a6947ad8cc9091f9f445134143f",
-    strip_prefix = "boost_1_72_0",
+    sha256 = "4b2136f98bdd1f5857f1c3dea9ac2018effe65286cf251534b6ae20cc45e1847",
+    strip_prefix = "boost_1_80_0",
     urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz",
-        "https://storage.googleapis.com/mirror.tensorflow.org/downloads.sourceforge.net/project/boost/boost/1.72.0/boost_1_72_0.tar.gz",
-        "https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz",
-        "https://downloads.sourceforge.net/project/boost/boost/1.72.0/boost_1_72_0.tar.gz",
+        "https://downloads.sourceforge.net/project/boost/boost/1.80.0/boost_1_80_0.tar.gz",
     ],
 )
 
