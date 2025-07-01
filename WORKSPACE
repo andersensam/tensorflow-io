@@ -256,11 +256,10 @@ http_archive(
 http_archive(
     name = "arrow",
     build_file = "//third_party:arrow.BUILD",
-    sha256 = "57e13c62f27b710e1de54fd30faed612aefa22aa41fa2c0c3bacd204dd18a8f3",
-    strip_prefix = "arrow-apache-arrow-7.0.0",
+    sha256 = "2f28ead4acd0e2b519b7c41087e09eca8c12e212e9a3c01c714274549dc6c824",
+    strip_prefix = "arrow-apache-arrow-14.0.1.dev",
     urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/apache/arrow/archive/apache-arrow-7.0.0.tar.gz",
-        "https://github.com/apache/arrow/archive/apache-arrow-7.0.0.tar.gz",
+        "https://github.com/apache/arrow/archive/refs/tags/apache-arrow-14.0.1.dev.tar.gz",
     ],
 )
 
