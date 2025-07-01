@@ -84,7 +84,7 @@ cc_library(
             "/std:c++14",
         ],
         "//conditions:default": [
-            "-std=c++14",
+            "-std=c++17",
         ],
     }),
     defines = [
