@@ -228,6 +228,14 @@ tf_http_archive(
 )
 
 http_archive(
+    name = "glog",
+    build_file = "//third_party:glog.BUILD",
+    sha256 = "00e4a87e87b7e7612f519a41e491f16623b12423620006f59f5688bfd8d13b08",
+    strip_prefix = "glog-0.7.1",
+    url = "https://github.com/google/glog/archive/refs/tags/v0.7.1.tar.gz"
+)
+
+http_archive(
     name = "lmdb",
     build_file = "//third_party:lmdb.BUILD",
     sha256 = "22054926b426c66d8f2bc22071365df6e35f3aacf19ad943bc6167d4cae3bebb",

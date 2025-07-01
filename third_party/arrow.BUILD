@@ -120,5 +120,6 @@ cc_library(
         "@xsimd",
         "@zlib",
         "@zstd",
+        "@glog",
     ],
 )
