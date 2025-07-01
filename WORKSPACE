@@ -408,10 +408,10 @@ http_archive(
 http_archive(
     name = "dcmtk",
     build_file = "//third_party:dcmtk.BUILD",
-    sha256 = "29c63bd56cc95f0cac00bf7c60e7dc9aec3c7a6e21c00a8baaa46ef2f8520b53",
-    strip_prefix = "dcmtk-c29bebcd19bb963d72dcd00ca8745f60f6b9a39e",
+    sha256 = "fb1434c421d4cc5d391fe37d05f4a4a4267aab16af9826474a6ef366952a11cc",
+    strip_prefix = "dcmtk-5fba853b6f7c13b02bed28bd9f7d3f450e4c72bb",
     urls = [
-        "https://github.com/DCMTK/dcmtk/archive/c29bebcd19bb963d72dcd00ca8745f60f6b9a39e.zip",
+        "https://github.com/DCMTK/dcmtk/archive/5fba853b6f7c13b02bed28bd9f7d3f450e4c72bb.tar.gz",
     ],
 )
 
