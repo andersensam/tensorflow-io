@@ -325,10 +325,10 @@ http_archive(
 http_archive(
     name = "boost",
     build_file = "//third_party:boost.BUILD",
-    sha256 = "4b2136f98bdd1f5857f1c3dea9ac2018effe65286cf251534b6ae20cc45e1847",
-    strip_prefix = "boost_1_80_0",
+    sha256 = "be0d91732d5b0cc6fbb275c7939974457e79b54d6f07ce2e3dfdd68bef883b0b",
+    strip_prefix = "boost_1_85_0",
     urls = [
-        "https://downloads.sourceforge.net/project/boost/boost/1.80.0/boost_1_80_0.tar.gz",
+        "https://downloads.sourceforge.net/project/boost/boost/1.85.0/boost_1_85_0.tar.gz",
     ],
 )
 
