@@ -20,6 +20,11 @@ cc_library(
         "@com_google_absl//absl/synchronization",
         "@hadoop",
         "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
+        "@org_tensorflow//tensorflow/c:logging",
+        "@org_tensorflow//tensorflow/c:c_api_macros",
+        "@org_tensorflow//tensorflow/c:tf_file_statistics",
+        "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+
     ],
     alwayslink = 1,
 )

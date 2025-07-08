@@ -52,7 +52,7 @@ cc_library(
         ":libhdfspp",
         ":orc_cc_proto",
         "@lz4",
-        "@snappy",
+        "@snappy_liborc",
         "@zlib",
         "@zstd",
     ],

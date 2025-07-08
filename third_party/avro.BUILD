@@ -29,6 +29,6 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@boost",
-        "@snappy",
+        "@snappy_liborc",
     ],
 )

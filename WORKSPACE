@@ -13,10 +13,19 @@ http_archive(
     url = "https://zlib.net/zlib-1.3.1.tar.gz"
 )
 
-# Note: snappy is placed earlier as tensorflow's snappy does not include snappy-c
 http_archive(
     name = "snappy",
     build_file = "//third_party:snappy.BUILD",
+    sha256 = "7ee7540b23ae04df961af24309a55484e7016106e979f83323536a1322cedf1b",
+    strip_prefix = "snappy-1.2.0",
+    url = "https://github.com/google/snappy/archive/1.2.0.zip",
+)
+
+
+# Note: snappy is placed earlier as tensorflow's snappy does not include snappy-c
+http_archive(
+    name = "snappy_liborc",
+    build_file = "//third_party:snappy_liborc.BUILD",
     sha256 = "16b677f07832a612b0836178db7f374e414f94657c138e6993cbfc5dcc58651f",
     strip_prefix = "snappy-1.1.8",
     urls = [
@@ -26,12 +35,18 @@ http_archive(
 )
 
 
-
+# Note: boringssl is placed earlier as boringssl needs to be patched for mongodb
 http_archive(
     name = "boringssl",
-    sha256 = "9dc53f851107eaf87b391136d13b815df97ec8f76dadb487b58b2fc45e624d2c",
-    strip_prefix = "boringssl-c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc",
-    url = "https://github.com/google/boringssl/archive/c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz",
+    patch_cmds = [
+        """sed -i.bak 's/bio.c",/bio.c","src\\/decrepit\\/bio\\/base64_bio.c",/g' BUILD.generated.bzl""",
+    ],
+    sha256 = "a9c3b03657d507975a32732f04563132b4553c20747cec6dc04de475c8bdf29f",
+    strip_prefix = "boringssl-80ca9f9f6ece29ab132cce4cf807a9465a18cfac",
+    urls = [
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
+        "https://github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
+    ],
 )
 
 # Note google_cloud_cpp is placed earlier as tensorflow's version is older
@@ -86,7 +101,7 @@ switched_rules_by_language(
 
 http_archive(
     name = "org_tensorflow",
-    sha256 = "c5a52685b88481fdbb064fdd77eac48870197fe5a68b87da06bd3e4311527035",
+    sha256 = "7bf78592f5fce993d92b3d40a77a8de908d90a13d147a5bb34eca5378bd5df4e",
     strip_prefix = "tensorflow-r2.19",
     urls = [
         "https://github.com/andersensam/tensorflow/archive/refs/heads/r2.19.zip",
@@ -208,8 +223,8 @@ load("@org_tensorflow//third_party:repo.bzl", "tf_http_archive", "tf_mirror_urls
 
 tf_http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "b956598d8cbe168b5ee717b5dafa56563eb5201a947856a6688bbeac9cac4e1f",
-    strip_prefix = "grpc-b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd",
+    sha256 = "e11fd9b963c617de53d08a84f41359164b123f2e8e4180644706688fc9de43d9",
+    strip_prefix = "grpc-1.73.1",
     #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
     patch_file = [
         "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
@@ -224,7 +239,7 @@ tf_http_archive(
         "@org_tensorflow//third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
         "@org_tensorflow//third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
     },
-    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/b54a5b338637f92bfcf4b0bc05e0f57a5fd8fadd.tar.gz")
+    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.73.1.tar.gz")
 )
 
 http_archive(
@@ -259,10 +274,11 @@ http_archive(
 http_archive(
     name = "arrow",
     build_file = "//third_party:arrow.BUILD",
-    sha256 = "89efbbf852f5a1f79e9c99ab4c217e2eb7f991837c005cba2d4a2fbd35fad212",
-    strip_prefix = "apache-arrow-20.0.0",
+    sha256 = "57e13c62f27b710e1de54fd30faed612aefa22aa41fa2c0c3bacd204dd18a8f3",
+    strip_prefix = "arrow-apache-arrow-7.0.0",
     urls = [
-        "https://github.com/apache/arrow/releases/download/apache-arrow-20.0.0/apache-arrow-20.0.0.tar.gz",
+        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/apache/arrow/archive/apache-arrow-7.0.0.tar.gz",
+        "https://github.com/apache/arrow/archive/apache-arrow-7.0.0.tar.gz",
     ],
 )
 
@@ -327,10 +343,13 @@ http_archive(
 http_archive(
     name = "boost",
     build_file = "//third_party:boost.BUILD",
-    sha256 = "be0d91732d5b0cc6fbb275c7939974457e79b54d6f07ce2e3dfdd68bef883b0b",
-    strip_prefix = "boost_1_85_0",
+    sha256 = "c66e88d5786f2ca4dbebb14e06b566fb642a1a6947ad8cc9091f9f445134143f",
+    strip_prefix = "boost_1_72_0",
     urls = [
-        "https://downloads.sourceforge.net/project/boost/boost/1.85.0/boost_1_85_0.tar.gz",
+        "https://storage.googleapis.com/mirror.tensorflow.org/dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz",
+        "https://storage.googleapis.com/mirror.tensorflow.org/downloads.sourceforge.net/project/boost/boost/1.72.0/boost_1_72_0.tar.gz",
+        "https://dl.bintray.com/boostorg/release/1.72.0/source/boost_1_72_0.tar.gz",
+        "https://downloads.sourceforge.net/project/boost/boost/1.72.0/boost_1_72_0.tar.gz",
     ],
 )
 

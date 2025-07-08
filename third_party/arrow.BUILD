@@ -115,7 +115,7 @@ cc_library(
         "@double-conversion",
         "@lz4",
         "@rapidjson",
-        "@snappy",
+        "@snappy_liborc",
         "@thrift",
         "@xsimd",
         "@zlib",
