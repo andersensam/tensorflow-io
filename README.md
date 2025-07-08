@@ -6,6 +6,25 @@
 
 # TensorFlow I/O
 
+This repo is an unofficial fork of TensorFlow I/O and is **as-is**.
+
+The purpose of this fork is to build TFIO against TensorFlow r2.19.
+
+The Dockerfile in this repo contains all steps to build TFIO. Please note the Dockerfile expects the following to be available:
+
+`LLVM-20.1.7-Linux-X64.tar.xz`
+
+`bazel`, see note in Dockerfile about this issue.
+
+A successful build dumps out the wheel as specified:
+```
+FROM scratch AS target
+COPY --from=base /workspace/tensorflow-io/dist /wheels
+```
+
+You can check the TensorFlow 2.19 (With CUDA 12.8 support / Blackwell) repo [here](https://github.com/andersensam/tensorflow/tree/r2.19)
+-----------------
+
 [![GitHub CI](https://github.com/tensorflow/io/workflows/GitHub%20CI/badge.svg?branch=master)](https://github.com/tensorflow/io/actions?query=branch%3Amaster)
 [![PyPI](https://badge.fury.io/py/tensorflow-io.svg)](https://pypi.org/project/tensorflow-io/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/tensorflow/io/blob/master/LICENSE)
