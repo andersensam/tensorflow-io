@@ -83,7 +83,7 @@ cc_library(
     deps = [
         "@boringssl//:crypto",
         "@boringssl//:ssl",
-        "@snappy",
+        "@snappy_liborc",
         "@zlib",
         "@zstd",
     ],
