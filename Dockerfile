@@ -63,7 +63,7 @@ WORKDIR /workspace
 RUN git clone --depth 1 https://github.com/andersensam/tensorflow-io && \
     pip install --upgrade pip && pip install uv && pip cache purge && \
     UV_FIND_LINKS=https://storage.googleapis.com/axlearn-wheels/wheels.html uv pip install tensorflow==2.19.1 setuptools && \
-    uv cache clean
+    uv cache clean && echo "Cache cleaned"
 
 WORKDIR /workspace/tensorflow-io
 COPY tfio.brc .bazelrc
