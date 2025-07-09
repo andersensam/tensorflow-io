@@ -27,7 +27,22 @@ cc_library(
             "@local_config_tf//:stub/libtensorflow_framework.so",
         ],
     }),
-    copts = tf_io_copts() + "-std=c++17",
+    copts = select({
+        "@bazel_tools//src/conditions:windows": [
+            "/DEIGEN_STRONG_INLINE=inline", 
+            "-DTENSORFLOW_MONOLITHIC_BUILD", 
+            "/DPLATFORM_WINDOWS", 
+            "/DEIGEN_HAS_C99_MATH", 
+            "/DTENSORFLOW_USE_EIGEN_THREADPOOL", 
+            "/DEIGEN_AVOID_STL_ARRAY", 
+            "/Iexternal/gemmlowp", 
+            "/wd4018", 
+            "/wd4577", 
+            "/DNOGDI", 
+            "/UTF_COMPILE_LIBRARY", 
+            "/DNDEBUG"], 
+        "@bazel_tools//src/conditions:darwin": ["-DNDEBUG"],
+        "//conditions:default": ["-DNDEBUG", "-pthread"], "-std=c++17"}),
     linkstatic = True,
     deps = [
         "@com_github_googleapis_google_cloud_cpp//:storage_client",
