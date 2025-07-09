@@ -30,7 +30,7 @@ cc_library(
     copts = [
         tf_io_copts(),
         "-std=c++17",
-    ]
+    ],
     linkstatic = True,
     deps = [
         "@com_github_googleapis_google_cloud_cpp//:storage_client",
