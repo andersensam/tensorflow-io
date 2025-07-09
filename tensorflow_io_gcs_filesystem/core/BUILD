@@ -38,6 +38,9 @@ cc_library(
         "@local_config_tf//:tf_c_header_lib",
         "@local_config_tf//:tf_tsl_header_lib",
         "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
+        "@org_tensorflow//tensorflow/c:c_api_macros",
+        "@org_tensorflow//tensorflow/c:env",
+        "@org_tensorflow//tensorflow/c:c_api",
     ],
     alwayslink = 1,
 )
