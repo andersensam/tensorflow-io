@@ -8,7 +8,7 @@
 
 This repo is an unofficial fork of TensorFlow I/O and is **as-is**.
 
-The purpose of this fork is to build TFIO against TensorFlow r2.19.
+The purpose of this fork is to build TFIO against TensorFlow r2.19. This is being released as custom version `0.37.2` to avoid package conflicts elsewhere
 
 The Dockerfile in this repo contains all steps to build TFIO. Please note the Dockerfile expects the following to be available:
 
@@ -23,6 +23,7 @@ COPY --from=base /workspace/tensorflow-io/dist /wheels
 ```
 
 You can check the TensorFlow 2.19 (With CUDA 12.8 support / Blackwell) repo [here](https://github.com/andersensam/tensorflow/tree/r2.19)
+
 -----------------
 
 [![GitHub CI](https://github.com/tensorflow/io/workflows/GitHub%20CI/badge.svg?branch=master)](https://github.com/tensorflow/io/actions?query=branch%3Amaster)
