@@ -62,17 +62,16 @@ RUN chmod +x /usr/local/bin/bazel && /usr/local/bin/bazel version
 WORKDIR /workspace
 RUN git clone --depth 1 https://github.com/andersensam/tensorflow-io && \
     pip install --upgrade pip && pip install uv && pip cache purge && \
-    UV_FIND_LINKS=https://storage.googleapis.com/axlearn-wheels/wheels.html uv pip install tensorflow==2.19.0 setuptools && \
-    uv pip uninstall tensorflow && \
-    uv pip install --no-index --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.0
+    UV_FIND_LINKS=https://storage.googleapis.com/axlearn-wheels/wheels.html uv pip install tensorflow==2.19.1 setuptools && \
+    uv cache clean
 
 WORKDIR /workspace/tensorflow-io
-COPY tfio.bazelrc .bazelrc
+COPY tfio.brc .bazelrc
 RUN bazel build --copt="-fPIC"  --verbose_failures --spawn_strategy=local \
     --copt=-I/usr/include/tirpc --linkopt=-fuse-ld=gold \
     --per_file_copt=third_party/.*,external/.*@-Wno-error \
     -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so"
-RUN python3 setup.py --data bazel-bin bdist_wheel
+RUN python3 setup.py --data bazel-bin bdist_wheel && mkdir -p /mnt/export && cp dist/*.whl /mnt/export
 
 FROM scratch AS target
-COPY --from=base /workspace/tensorflow-io/dist /wheels
+COPY --from=base /mnt/export /wheels
