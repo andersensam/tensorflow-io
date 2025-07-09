@@ -70,8 +70,11 @@ COPY tfio.brc .bazelrc
 RUN bazel build --copt="-fPIC"  --verbose_failures --spawn_strategy=local \
     --copt=-I/usr/include/tirpc --linkopt=-fuse-ld=gold \
     --per_file_copt=third_party/.*,external/.*@-Wno-error \
-    -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so"
-RUN python3 setup.py --data bazel-bin bdist_wheel && mkdir -p /mnt/export && cp dist/*.whl /mnt/export
+    -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so" \
+    "//tensorflow_io_gcs_filesystem/..."
+RUN python3 setup.py --data bazel-bin bdist_wheel && \
+    python3 setup.py --data bazel-bin bdist_wheel --project tensorflow-io-gcs-filesystem && \
+    mkdir -p /mnt/export && cp dist/*.whl /mnt/export
 
 FROM scratch AS target
 COPY --from=base /mnt/export /wheels

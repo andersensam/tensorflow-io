@@ -166,7 +166,7 @@ setuptools.setup(
     ],
     keywords="tensorflow io machine learning",
     packages=setuptools.find_packages(where=".", exclude=exclude),
-    python_requires=">=3.9, <3.13",
+    python_requires=">=3.12, <3.13",
     install_requires=install_requires,
     extras_require={
         "tensorflow": [require],

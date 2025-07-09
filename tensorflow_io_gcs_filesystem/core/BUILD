@@ -27,7 +27,7 @@ cc_library(
             "@local_config_tf//:stub/libtensorflow_framework.so",
         ],
     }),
-    copts = ["-std=c++17"] + tf_io_copts(),
+    copts = tf_io_copts(),
     linkstatic = True,
     deps = [
         "@com_github_googleapis_google_cloud_cpp//:storage_client",
@@ -39,15 +39,17 @@ cc_library(
         "@local_config_tf//:tf_tsl_header_lib",
         "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
         "@org_tensorflow//tensorflow/c:c_api_macros",
-        "@org_tensorflow//tensorflow/c:env",
-        "@org_tensorflow//tensorflow/c:c_api",
+        "@org_tensorflow//tensorflow/c:env_hdrs",
+        "@org_tensorflow//tensorflow/c:tf_file_statistics",
+        "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+        "@org_tensorflow//tensorflow/c:logging",
     ],
     alwayslink = 1,
 )
 
 cc_binary(
     name = "python/ops/libtensorflow_io_gcs_filesystem.so",
-    copts = ["-std=c++17"] + tf_io_copts(),
+    copts = tf_io_copts(),
     linkshared = 1,
     deps = [
         "//tensorflow_io_gcs_filesystem/core:gs",
