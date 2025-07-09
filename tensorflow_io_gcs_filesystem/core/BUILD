@@ -27,7 +27,10 @@ cc_library(
             "@local_config_tf//:stub/libtensorflow_framework.so",
         ],
     }),
-    copts = tf_io_copts(),
+    copts = [
+        tf_io_copts(),
+        "-std=c++17",
+    ]
     linkstatic = True,
     deps = [
         "@com_github_googleapis_google_cloud_cpp//:storage_client",
