@@ -22,6 +22,53 @@ FROM scratch AS target
 COPY --from=base /workspace/tensorflow-io/dist /wheels
 ```
 
+### macOS Compilation Instructions
+
+Create a virtual environment:
+
+```
+python3.12 -m venv .venv
+source .venv/bin/activate
+```
+
+Ensure the right version of TensorFlow is installed
+```
+pip install --upgrade pip 
+pip install uv
+uv pip install --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.1
+```
+
+Run the configure script
+
+```
+./configure
+```
+
+Edit `.bazelrc` to ensure the right macos targets are present:
+
+```
+build:macos --copt="-DGRPC_BAZEL_BUILD"
+build:macos --copt="-D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION"
+build:macos --action_env MACOSX_DEPLOYMENT_TARGET=12.0
+build:macos --define=grpc_no_ares=true
+build:macos --copt=-Wno-traditional
+```
+
+Build and package
+
+```
+bazel build --copt="-fPIC"  --verbose_failures --spawn_strategy=local \
+    --per_file_copt="third_party/.*,external/.*@-Wno-error" \
+    --config=macos \
+    --experimental_repo_remote_exec \
+    -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so" \
+    "//tensorflow_io_gcs_filesystem/..."
+
+python3 setup.py --data bazel-bin bdist_wheel
+python3 setup.py --data bazel-bin bdist_wheel --project tensorflow-io-gcs-filesystem
+```
+
+
 You can check the TensorFlow 2.19 (With CUDA 12.8 support / Blackwell) repo [here](https://github.com/andersensam/tensorflow/tree/r2.19)
 
 -----------------
