@@ -34,7 +34,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@libjpeg_turbo//:jpeg",
-        "@libwebp",
+        "@libwebp-io",
         "@xz//:lzma",
         "@zlib",
         "@zstd",

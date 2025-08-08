@@ -6,7 +6,7 @@ licenses(["notice"])  # WebM license
 exports_files(["COPYING"])
 
 cc_library(
-    name = "libwebp",
+    name = "libwebp-io",
     srcs = glob([
         "src/dsp/*.c",
         "src/dsp/*.h",

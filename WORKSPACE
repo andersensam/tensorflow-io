@@ -101,10 +101,10 @@ switched_rules_by_language(
 
 http_archive(
     name = "org_tensorflow",
-    sha256 = "1f6e0f9e02cfa8dfcf248405b8cdefcbffcffd18ebe8a7f5273159fc256a3ed5",
-    strip_prefix = "tensorflow-r2.19",
+    strip_prefix = "tensorflow-r2.20",
+    sha256 = "9491ee41dc598eacded31e248c0fbc7efa4589987cfcc331106cdfa600bc4b1d",
     urls = [
-        "https://github.com/andersensam/tensorflow/archive/refs/heads/r2.19.zip",
+        "https://github.com/andersensam/tensorflow/archive/refs/heads/r2.20.zip"
     ],
 )
 
@@ -167,7 +167,14 @@ load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
 tf_workspace0()
 
 load(
-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_json_init_repository.bzl",
+    "@org_tensorflow//third_party/xla/third_party/py:python_wheel.bzl",
+    "python_wheel_version_suffix_repository",
+)
+
+python_wheel_version_suffix_repository(name = "tf_wheel_version_suffix")
+
+load(
+    "@rules_ml_toolchain//third_party/gpus/cuda/hermetic:cuda_json_init_repository.bzl",
     "cuda_json_init_repository",
 )
 
@@ -179,7 +186,7 @@ load(
     "CUDNN_REDISTRIBUTIONS",
 )
 load(
-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_redist_init_repositories.bzl",
+    "@rules_ml_toolchain//third_party/gpus/cuda/hermetic:cuda_redist_init_repositories.bzl",
     "cuda_redist_init_repositories",
     "cudnn_redist_init_repository",
 )
@@ -193,21 +200,21 @@ cudnn_redist_init_repository(
 )
 
 load(
-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_configure.bzl",
+    "@rules_ml_toolchain//third_party/gpus/cuda/hermetic:cuda_configure.bzl",
     "cuda_configure",
 )
 
 cuda_configure(name = "local_config_cuda")
 
 load(
-    "@org_tensorflow//third_party/nccl/hermetic:nccl_redist_init_repository.bzl",
+    "@rules_ml_toolchain//third_party/nccl/hermetic:nccl_redist_init_repository.bzl",
     "nccl_redist_init_repository",
 )
 
 nccl_redist_init_repository()
 
 load(
-    "@org_tensorflow//third_party/nccl/hermetic:nccl_configure.bzl",
+    "@rules_ml_toolchain//third_party/nccl/hermetic:nccl_configure.bzl",
     "nccl_configure",
 )
 
@@ -730,8 +737,8 @@ http_archive(
 )
 
 http_archive(
-    name = "libwebp",
-    build_file = "//third_party:libwebp.BUILD",
+    name = "libwebp-io",
+    build_file = "//third_party:libwebp-io.BUILD",
     sha256 = "01bcde6a40a602294994050b81df379d71c40b7e39c819c024d079b3c56307f4",
     strip_prefix = "libwebp-1.2.1",
     urls = [

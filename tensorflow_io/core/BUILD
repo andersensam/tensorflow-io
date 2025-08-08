@@ -367,7 +367,7 @@ cc_library(
         "@libavif",
         "@libgeotiff",
         "@libtiff",
-        "@libwebp",
+        "@libwebp-io",
         "@libyuv",
         "@openexr",
         "@openjpeg",
