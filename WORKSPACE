@@ -234,7 +234,7 @@ tf_http_archive(
     sha256 = "afbc5d78d6ba6d509cc6e264de0d49dcd7304db435cbf2d630385bacf49e066c",
     strip_prefix = "grpc-1.68.2",
     patch_file = [
-        "//third_party/grpc:grpc.patch",
+        "@org_tensorflow//third_party/grpc:grpc.patch",
     ],
     urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.68.2.tar.gz"),
 )
