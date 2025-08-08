@@ -228,25 +228,15 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
 load("@org_tensorflow//third_party:repo.bzl", "tf_http_archive", "tf_mirror_urls")
 
+# WARNING: make sure ncteisen@ and vpai@ are cc-ed on any CL to change the below rule
 tf_http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "e11fd9b963c617de53d08a84f41359164b123f2e8e4180644706688fc9de43d9",
-    strip_prefix = "grpc-1.73.1",
-    #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
+    sha256 = "afbc5d78d6ba6d509cc6e264de0d49dcd7304db435cbf2d630385bacf49e066c",
+    strip_prefix = "grpc-1.68.2",
     patch_file = [
-        "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
-        "@org_tensorflow//third_party/grpc:register_go_toolchain.patch",
+        "//third_party/grpc:grpc.patch",
     ],
-    system_link_files = {
-        "@org_tensorflow//third_party/systemlibs:BUILD": "bazel/BUILD",
-        "@org_tensorflow//third_party/systemlibs:grpc.BUILD": "src/compiler/BUILD",
-        "@org_tensorflow//third_party/systemlibs:grpc.bazel.grpc_deps.bzl": "bazel/grpc_deps.bzl",
-        "@org_tensorflow//third_party/systemlibs:grpc.bazel.grpc_extra_deps.bzl": "bazel/grpc_extra_deps.bzl",
-        "@org_tensorflow//third_party/systemlibs:grpc.bazel.cc_grpc_library.bzl": "bazel/cc_grpc_library.bzl",
-        "@org_tensorflow//third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
-        "@org_tensorflow//third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
-    },
-    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.73.1.tar.gz")
+    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.68.2.tar.gz"),
 )
 
 http_archive(
