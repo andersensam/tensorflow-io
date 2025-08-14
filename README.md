@@ -35,7 +35,7 @@ Ensure the right version of TensorFlow is installed
 ```
 pip install --upgrade pip 
 pip install uv
-uv pip install --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.1
+uv pip install --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.0.1
 ```
 
 Run the configure script

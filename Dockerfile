@@ -62,7 +62,7 @@ RUN chmod +x /usr/local/bin/bazel && /usr/local/bin/bazel version
 WORKDIR /workspace
 RUN git clone --depth 1 https://github.com/andersensam/tensorflow-io && \
     pip install --upgrade pip && pip install uv && pip cache purge && \
-    UV_FIND_LINKS=https://storage.googleapis.com/axlearn-wheels/wheels.html uv pip install tensorflow==2.19.1 setuptools && \
+    UV_FIND_LINKS=https://storage.googleapis.com/axlearn-wheels/wheels.html uv pip install tensorflow==2.19.0.1 setuptools && \
     uv cache clean && echo "Cache cleaned"
 
 WORKDIR /workspace/tensorflow-io

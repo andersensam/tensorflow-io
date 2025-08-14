@@ -101,7 +101,7 @@ switched_rules_by_language(
 
 http_archive(
     name = "org_tensorflow",
-    sha256 = "1f6e0f9e02cfa8dfcf248405b8cdefcbffcffd18ebe8a7f5273159fc256a3ed5",
+    sha256 = "7bb289776c1a96b4f8c7fe25785f2e9fb109efd7e198aef024ed7c3d8c68d622",
     strip_prefix = "tensorflow-r2.19",
     urls = [
         "https://github.com/andersensam/tensorflow/archive/refs/heads/r2.19.zip",
