@@ -1,6 +1,7 @@
 workspace(name = "org_tensorflow_io")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # Note: zlib is placed earlier as tensorflow's zlib does not include unzip
 
@@ -99,13 +100,11 @@ switched_rules_by_language(
     grpc = True,
 )
 
-http_archive(
+# Use git_repository to avoid having to update SHA256 each time a new commit is made
+git_repository(
     name = "org_tensorflow",
-    sha256 = "7bb289776c1a96b4f8c7fe25785f2e9fb109efd7e198aef024ed7c3d8c68d622",
-    strip_prefix = "tensorflow-r2.19",
-    urls = [
-        "https://github.com/andersensam/tensorflow/archive/refs/heads/r2.19.zip",
-    ],
+    branch = "r2.19",
+    remote = "https://github.com/andersensam/tensorflow.git"
 )
 
 load("@org_tensorflow//third_party/xla/third_party/py:python_init_rules.bzl", "python_init_rules")

@@ -8,68 +8,11 @@
 
 This repo is an unofficial fork of TensorFlow I/O and is **as-is**.
 
-The purpose of this fork is to build TFIO against TensorFlow r2.19. This is being released as custom version `0.37.2` to avoid package conflicts elsewhere
+The purpose of this fork is to build TensorFlow I/O against TensorFlow r2.19. This is being released as custom version `0.37.2` to avoid package conflicts elsewhere
 
-The Dockerfile in this repo contains all steps to build TFIO. Please note the Dockerfile expects the following to be available:
+Please reference the [example README.md](examples/README.md) for instructions on compilation for Linux and macOS.
 
-`LLVM-20.1.7-Linux-X64.tar.xz`
-
-`bazel`, see note in Dockerfile about this issue.
-
-A successful build dumps out the wheel as specified:
-```
-FROM scratch AS target
-COPY --from=base /workspace/tensorflow-io/dist /wheels
-```
-
-### macOS Compilation Instructions
-
-Create a virtual environment:
-
-```
-python3.12 -m venv .venv
-source .venv/bin/activate
-```
-
-Ensure the right version of TensorFlow is installed
-```
-pip install --upgrade pip 
-pip install uv
-uv pip install --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.0.1
-```
-
-Run the configure script
-
-```
-./configure
-```
-
-Edit `.bazelrc` to ensure the right macos targets are present:
-
-```
-build:macos --copt="-DGRPC_BAZEL_BUILD"
-build:macos --copt="-D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION"
-build:macos --action_env MACOSX_DEPLOYMENT_TARGET=12.0
-build:macos --define=grpc_no_ares=true
-build:macos --copt=-Wno-traditional
-```
-
-Build and package
-
-```
-bazel build --copt="-fPIC"  --verbose_failures --spawn_strategy=local \
-    --per_file_copt="third_party/.*,external/.*@-Wno-error" \
-    --config=macos \
-    --experimental_repo_remote_exec \
-    -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so" \
-    "//tensorflow_io_gcs_filesystem/..."
-
-python3 setup.py --data bazel-bin bdist_wheel
-python3 setup.py --data bazel-bin bdist_wheel --project tensorflow-io-gcs-filesystem
-```
-
-
-You can check the TensorFlow 2.19 (With CUDA 12.8 support / Blackwell) repo [here](https://github.com/andersensam/tensorflow/tree/r2.19)
+You can check the TensorFlow 2.19 (With CUDA 12.8.1 support / Blackwell) repo [here](https://github.com/andersensam/tensorflow/tree/r2.19)
 
 -----------------
 
