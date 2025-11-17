@@ -45,6 +45,7 @@ cc_binary(
         "//tensorflow_io/core:mongodb_ops",
         "@local_config_tf//:libtensorflow_framework",
         "@local_config_tf//:tf_header_lib",
+        "@jsoncpp_git//:jsoncpp",
     ] + select({
         "@bazel_tools//src/conditions:windows": [],
         "@bazel_tools//src/conditions:darwin_arm64": [],

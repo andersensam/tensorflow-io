@@ -1072,11 +1072,10 @@ go_repository(
 )
 
 http_archive(
-    name = "nlohmann_json_lib",
-    build_file = "//third_party:nlohmann_json.BUILD",
-    sha256 = "5daca6ca216495edf89d167f808d1d03c4a4d929cef7da5e10f135ae1540c7e4",
-    strip_prefix = "json-3.10.5",
+    name = "jsoncpp_git",
+    sha256 = "f409856e5920c18d0c2fb85276e24ee607d2a09b5e7d5f0a371368903c275da2",
+    strip_prefix = "jsoncpp-1.9.5",
     urls = [
-        "https://github.com/nlohmann/json/archive/v3.10.5.tar.gz",
+        "https://github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz",
     ]
 )
