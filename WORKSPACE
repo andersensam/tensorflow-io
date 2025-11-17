@@ -1070,3 +1070,13 @@ go_repository(
     importpath = "github.com/prometheus/prom2json",
     tag = "v1.2.2",
 )
+
+http_archive(
+    name = "nlohmann_json_lib",
+    build_file = "//third_party:nlohmann_json.BUILD",
+    sha256 = "5daca6ca216495edf89d167f808d1d03c4a4d929cef7da5e10f135ae1540c7e4",
+    strip_prefix = "json-3.10.5",
+    urls = [
+        "https://github.com/nlohmann/json/archive/v3.10.5.tar.gz",
+    ]
+)
