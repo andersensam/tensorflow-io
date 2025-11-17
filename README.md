@@ -8,7 +8,7 @@
 
 This repo is an unofficial fork of TensorFlow I/O and is **as-is**.
 
-The purpose of this fork is to build TensorFlow I/O against TensorFlow r2.19. This is being released as custom version `0.37.2` to avoid package conflicts elsewhere
+The purpose of this fork is to build TensorFlow I/O against TensorFlow r2.19. This is being released as custom version `0.37.3` to avoid package conflicts elsewhere
 
 Please reference the [example README.md](examples/README.md) for instructions on compilation for Linux and macOS.
 

@@ -40,7 +40,7 @@ RUN git clone --depth 1 https://github.com/andersensam/tensorflow-io && \
     pip install --upgrade pip && pip install uv && pip cache purge && \
     uv pip install tensorflow==2.19.1 setuptools && \
     uv pip uninstall tensorflow && \
-    uv pip install --no-deps --no-index --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.1.1 && \
+    uv pip install --no-deps --no-index --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.19.1.2 && \
     uv cache clean
 
 WORKDIR /workspace/tensorflow-io
