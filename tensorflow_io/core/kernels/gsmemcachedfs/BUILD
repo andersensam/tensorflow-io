@@ -64,6 +64,7 @@ cc_library(
         ":memcached_file_block_cache",
         "@com_google_absl//absl/memory",
         "@local_config_tf//:tf_header_lib",
+        "@jsoncpp_git//:jsoncpp",
     ],
 )
 
@@ -79,6 +80,7 @@ cc_library(
         ":memcached_file_system",
         "@com_google_absl//absl/memory",
         "@local_config_tf//:tf_header_lib",
+        "@jsoncpp_git//:jsoncpp",
     ],
     alwayslink = 1,
 )

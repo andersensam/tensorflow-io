@@ -1071,11 +1071,10 @@ go_repository(
     tag = "v1.2.2",
 )
 
-http_archive(
+tf_http_archive(
     name = "jsoncpp_git",
     sha256 = "f409856e5920c18d0c2fb85276e24ee607d2a09b5e7d5f0a371368903c275da2",
     strip_prefix = "jsoncpp-1.9.5",
-    urls = [
-        "https://github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz",
-    ]
+    system_build_file = "@org_tensorflow//third_party/systemlibs:jsoncpp.BUILD",
+    urls = tf_mirror_urls("https://github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz"),
 )
