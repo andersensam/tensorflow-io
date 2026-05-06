@@ -41,7 +41,7 @@ RUN git clone --depth 1 https://github.com/andersensam/tensorflow-io && \
     uv pip install tensorflow==2.19.1 setuptools && \
     uv pip uninstall tensorflow && \
     uv pip install --no-deps --no-index https://storage.googleapis.com/axlearn-wheels/tensorflow/tensorflow-2.19.1.3-cp312-cp312-manylinux_2_31_x86_64.whl && \
-    uv cache clean
+    uv cache clean && echo sup
 
 WORKDIR /workspace/tensorflow-io
 COPY tfio_py3.12.brc .bazelrc
@@ -51,8 +51,14 @@ RUN bazel build --copt="-fPIC"  --verbose_failures --spawn_strategy=local \
     -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so" \
     "//tensorflow_io_gcs_filesystem/..."
 
-RUN python3 setup.py --data bazel-bin bdist_wheel && \
-    python3 setup.py --data bazel-bin bdist_wheel --project tensorflow-io-gcs-filesystem && \
+RUN rm -rf build && \
+    mkdir build && \
+    cp -r -L bazel-bin/tensorflow_io build/tensorflow_io && \
+    python3 setup.py --data build bdist_wheel --plat-name manylinux_2_31_x86_64 && \
+    rm -rf build && \
+    mkdir build && \
+    cp -r -L bazel-bin/tensorflow_io_gcs_filesystem  build/tensorflow_io_gcs_filesystem && \
+    python3 setup.py --data build bdist_wheel --project tensorflow-io-gcs-filesystem --plat-name manylinux_2_31_x86_64 && \
     mkdir -p /mnt/export && cp dist/*.whl /mnt/export
 
 FROM scratch AS target
