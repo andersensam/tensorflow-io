@@ -36,12 +36,15 @@ COPY bazel /usr/local/bin/bazel
 RUN chmod +x /usr/local/bin/bazel && /usr/local/bin/bazel version && mkdir -p /workspace
 
 WORKDIR /workspace
+# Fetch the correct branch, grab TensorFlow, install our custom version
+# then create the tirpc symlink needed for compilation
 RUN git clone --depth 1 --branch tensorflow_r2.21.0.1 https://github.com/andersensam/tensorflow-io && \
     pip install --upgrade pip uv && pip cache purge && \
     uv pip install tensorflow==2.21.0 setuptools wheel && \
     uv pip uninstall tensorflow && \
     uv pip install --no-deps --no-index --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.21.0.1 && \
-    uv cache clean
+    uv cache clean && \
+    ln -s /usr/include/tirpc /workspace/tensorflow-io/third_party/tirpc
 
 WORKDIR /workspace/tensorflow-io
 COPY tfio_py3.12.brc .bazelrc
