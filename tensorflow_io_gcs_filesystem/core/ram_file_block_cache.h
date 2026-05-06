@@ -1,3 +1,5 @@
+#include "absl/log/log.h"
+#include "absl/strings/str_format.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +30,7 @@ limitations under the License.
 #include "absl/synchronization/mutex.h"
 #include "absl/synchronization/notification.h"
 #include "tensorflow/c/env.h"
-#include "tensorflow/c/logging.h"
+
 #include "tensorflow/c/tf_status.h"
 
 namespace tensorflow {
@@ -70,7 +72,7 @@ class RamFileBlockCache {
       pruning_thread_.reset(
           TF_StartThread(&thread_options, "TF_prune_FBC", PruneThread, this));
     }
-    TF_VLog(1, "GCS file block cache is %s.\n",
+    LOG(INFO) << absl::StrFormat("GCS file block cache is %s.\n",
             (IsCacheEnabled() ? "enabled" : "disabled"));
   }
 

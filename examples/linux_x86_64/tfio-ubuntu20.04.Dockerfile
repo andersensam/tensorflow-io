@@ -36,21 +36,27 @@ COPY bazel /usr/local/bin/bazel
 RUN chmod +x /usr/local/bin/bazel && /usr/local/bin/bazel version && mkdir -p /workspace
 
 WORKDIR /workspace
-RUN git clone --depth 1 https://github.com/andersensam/tensorflow-io && \
-    pip install --upgrade pip && pip install uv && pip cache purge && \
-    uv pip install tensorflow==2.19.1 setuptools && \
+RUN git clone --depth 1 --branch tensorflow_r2.21.0.1 https://github.com/andersensam/tensorflow-io && \
+    pip install --upgrade pip uv && pip cache purge && \
+    uv pip install tensorflow==2.21.0 setuptools wheel && \
     uv pip uninstall tensorflow && \
-    uv pip install --no-deps --no-index https://storage.googleapis.com/axlearn-wheels/tensorflow/tensorflow-2.19.1.3-cp312-cp312-manylinux_2_31_x86_64.whl && \
-    uv cache clean && echo sup
+    uv pip install --no-deps --no-index --find-links https://storage.googleapis.com/axlearn-wheels/wheels.html tensorflow==2.21.0.1 && \
+    uv cache clean
 
 WORKDIR /workspace/tensorflow-io
 COPY tfio_py3.12.brc .bazelrc
-RUN bazel build --copt="-fPIC"  --verbose_failures --spawn_strategy=local \
-    --copt=-I/usr/include/tirpc --linkopt=-fuse-ld=gold \
+# Run the build with all flags we found necessary
+RUN bazel build --noenable_bzlmod --copt="-fPIC" --verbose_failures --spawn_strategy=local \
+    --copt=-Ithird_party/tirpc --linkopt=-fuse-ld=gold \
     --per_file_copt=third_party/.*,external/.*@-Wno-error \
+    --per_file_copt=third_party/.*,external/.*@-Wno-implicit-function-declaration \
+    --per_file_copt=third_party/.*,external/.*@-Wno-int-conversion \
+    --per_file_copt=third_party/.*,external/.*@-Wno-enum-constexpr-conversion \
+    --per_file_copt=third_party/.*,external/.*@-Wno-private-header \
     -- "//tensorflow_io:python/ops/libtensorflow_io.so" "//tensorflow_io:python/ops/libtensorflow_io_plugins.so" \
     "//tensorflow_io_gcs_filesystem/..."
 
+# Build the wheels
 RUN rm -rf build && \
     mkdir build && \
     cp -r -L bazel-bin/tensorflow_io build/tensorflow_io && \

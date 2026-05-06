@@ -1,3 +1,6 @@
+#include <iostream>
+#include "absl/log/log.h"
+#include "absl/strings/str_format.h"
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +32,7 @@ limitations under the License.
 #include "absl/strings/strip.h"
 #include "azure/storage/blobs/blob_container_client.hpp"
 #include "azure/storage/blobs/block_blob_client.hpp"
-#include "tensorflow/c/logging.h"
+
 #include "tensorflow/c/tf_status.h"
 #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
 
@@ -216,7 +219,7 @@ std::string StorageExceptionInfo(const Azure::Storage::StorageException& e) {
 void ListResources(const std::string& dir, const std::string& delimiter,
                    Azure::Storage::Blobs::BlobContainerClient& blob_client,
                    std::vector<std::string>* results, TF_Status* status) {
-  TF_VLog(1, "ListResources: %s\n", dir.c_str());
+  LOG(INFO) << absl::StrFormat("ListResources: %s\n", dir.c_str());
   if (!results) {
     TF_SetStatus(status, TF_INTERNAL, "results cannot be null");
     return;
@@ -269,7 +272,7 @@ class AzBlobRandomAccessFile {
   ~AzBlobRandomAccessFile() {}
   int64_t Read(uint64_t offset, size_t n, char* buffer,
                TF_Status* status) const {
-    TF_VLog(1, "ReadFileFromAz az://%s/%s/%s from %u for n: %u\n",
+    LOG(INFO) << absl::StrFormat("ReadFileFromAz az://%s/%s/%s from %u for n: %u\n",
             account_.c_str(), container_.c_str(), object_.c_str(), offset, n);
     // If n == 0, then return OkStatus()
     // otherwise, if bytes_read < n then return OutofRange
@@ -385,7 +388,7 @@ class AzBlobWritableFile {
       return;
     }
 
-    TF_VLog(1, "WriteFileToAz: az://%s/%s/%s\n", account_.c_str(),
+    LOG(INFO) << absl::StrFormat("WriteFileToAz: az://%s/%s/%s\n", account_.c_str(),
             container_.c_str(), object_.c_str());
 
     auto blob_container_client =
@@ -583,7 +586,7 @@ static void NewReadOnlyMemoryRegionFromFile(const TF_Filesystem* filesystem,
 
 static void CreateDir(const TF_Filesystem* filesystem, const char* path,
                       TF_Status* status) {
-  TF_VLog(1, "CreateDir %s\n", path);
+  LOG(INFO) << absl::StrFormat("CreateDir %s\n", path);
   std::string account, container, object;
   ParseAzBlobPath(path, true, &account, &container, &object, status);
   if (TF_GetCode(status) != TF_OK) {
@@ -610,7 +613,7 @@ static void RecursivelyCreateDir(const TF_Filesystem* filesystem,
 
 static void DeleteFile(const TF_Filesystem* filesystem, const char* path,
                        TF_Status* status) {
-  TF_VLog(1, "DeleteFile %s\n", path);
+  LOG(INFO) << absl::StrFormat("DeleteFile %s\n", path);
   std::string account, container, object;
   ParseAzBlobPath(path, false, &account, &container, &object, status);
   if (TF_GetCode(status) != TF_OK) {
@@ -634,7 +637,7 @@ static void DeleteFile(const TF_Filesystem* filesystem, const char* path,
 
 static void DeleteDir(const TF_Filesystem* filesystem, const char* path,
                       TF_Status* status) {
-  TF_VLog(1, "DeleteDir %s\n", path);
+  LOG(INFO) << absl::StrFormat("DeleteDir %s\n", path);
 
   std::string account, container, object;
   ParseAzBlobPath(path, false, &account, &container, &object, status);
@@ -712,7 +715,7 @@ static void DeleteRecursively(const TF_Filesystem* filesystem, const char* path,
 
 static void RenameFile(const TF_Filesystem* filesystem, const char* src,
                        const char* dst, TF_Status* status) {
-  TF_VLog(1, "RenameFile from: %s to %s\n", src, dst);
+  LOG(INFO) << absl::StrFormat("RenameFile from: %s to %s\n", src, dst);
   std::string src_account, src_container, src_object;
   ParseAzBlobPath(src, false, &src_account, &src_container, &src_object,
                   status);
@@ -785,7 +788,7 @@ static void RenameFile(const TF_Filesystem* filesystem, const char* src,
 
 static void CopyFile(const TF_Filesystem* filesystem, const char* src,
                      const char* dst, TF_Status* status) {
-  TF_VLog(1, "CopyFile from: %s to %s\n", src, dst);
+  LOG(INFO) << absl::StrFormat("CopyFile from: %s to %s\n", src, dst);
   // 128KB copy buffer
   constexpr size_t kCopyFileBufferSize = 128 * 1024;
 
@@ -827,7 +830,7 @@ static void CopyFile(const TF_Filesystem* filesystem, const char* src,
 
 static void PathExists(const TF_Filesystem* filesystem, const char* path,
                        TF_Status* status) {
-  TF_VLog(1, "PathExists on path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("PathExists on path: %s\n", path);
   std::string account, container, object;
   ParseAzBlobPath(path, false, &account, &container, &object, status);
   if (TF_GetCode(status) != TF_OK) {
@@ -858,7 +861,7 @@ static void PathExists(const TF_Filesystem* filesystem, const char* path,
 
 static bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
                         TF_Status* status) {
-  TF_VLog(1, "IsDirectory on path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("IsDirectory on path: %s\n", path);
   // Should check that account and container exist and that fname isn't a file
   // Azure storage file system is virtual and is created with path compenents in
   // blobs name so no need to check further
@@ -928,7 +931,7 @@ static bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
 
 static void Stat(const TF_Filesystem* filesystem, const char* path,
                  TF_FileStatistics* stats, TF_Status* status) {
-  TF_VLog(1, "Stat on path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("Stat on path: %s\n", path);
 
   using namespace std::chrono;
 
@@ -972,7 +975,7 @@ static void Stat(const TF_Filesystem* filesystem, const char* path,
 
 static int GetChildren(const TF_Filesystem* filesystem, const char* path,
                        char*** entries, TF_Status* status) {
-  TF_VLog(1, "GetChildren on path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("GetChildren on path: %s\n", path);
   std::string account, container, object;
   ParseAzBlobPath(path, true, &account, &container, &object, status);
   if (TF_GetCode(status) != TF_OK) {
@@ -1038,7 +1041,7 @@ static int GetChildren(const TF_Filesystem* filesystem, const char* path,
 
 static int64_t GetFileSize(const TF_Filesystem* filesystem, const char* path,
                            TF_Status* status) {
-  TF_VLog(1, "GetFileSize on path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("GetFileSize on path: %s\n", path);
   std::string account, container, object;
   ParseAzBlobPath(path, false, &account, &container, &object, status);
   if (TF_GetCode(status) != TF_OK) {

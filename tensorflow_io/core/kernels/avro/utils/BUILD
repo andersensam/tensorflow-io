@@ -21,6 +21,11 @@ cc_library(
     ],
     linkstatic = True,
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         "//tensorflow_io/core:dataset_ops",
         "@com_googlesource_code_re2//:re2",
     ],
@@ -41,5 +46,10 @@ cc_library(
     deps = [
         ":avro_utils_api",
         "@avro",
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
     ],
 )

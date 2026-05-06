@@ -35,7 +35,7 @@ cc_library(
     ],
     deps = [
         "@bzip2",
-        "@xz//:lzma",
+        "@custom_xz//:lzma",
         "@zlib",
         "@zstd",
     ],

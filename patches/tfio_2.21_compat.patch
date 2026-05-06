@@ -1,0 +1,1848 @@
+diff --git a/.bazelversion b/.bazelversion
+index f22d756d..1985849f 100644
+--- a/.bazelversion
++++ b/.bazelversion
+@@ -1 +1 @@
+-6.5.0
++7.7.0
+diff --git a/WORKSPACE b/WORKSPACE
+index c3db3054..4e2c2807 100644
+--- a/WORKSPACE
++++ b/WORKSPACE
+@@ -42,11 +42,10 @@ http_archive(
+     patch_cmds = [
+         """sed -i.bak 's/bio.c",/bio.c","src\\/decrepit\\/bio\\/base64_bio.c",/g' BUILD.generated.bzl""",
+     ],
+-    sha256 = "a9c3b03657d507975a32732f04563132b4553c20747cec6dc04de475c8bdf29f",
+-    strip_prefix = "boringssl-80ca9f9f6ece29ab132cce4cf807a9465a18cfac",
++    sha256 = "9dc53f851107eaf87b391136d13b815df97ec8f76dadb487b58b2fc45e624d2c",
++    strip_prefix = "boringssl-c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc",
+     urls = [
+-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
+-        "https://github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
++        "https://github.com/google/boringssl/archive/c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz",
+     ],
+ )
+ 
+@@ -103,15 +102,35 @@ switched_rules_by_language(
+ # Use git_repository to avoid having to update SHA256 each time a new commit is made
+ git_repository(
+     name = "org_tensorflow",
+-    branch = "r2.19",
+-    remote = "https://github.com/andersensam/tensorflow.git"
++    branch = "r2.21",
++    remote = "https://github.com/andersensam/tensorflow.git",
+ )
+ 
+-load("@org_tensorflow//third_party/xla/third_party/py:python_init_rules.bzl", "python_init_rules")
++http_archive(
++    name = "rules_ml_toolchain",
++    sha256 = "e437448557fb0528a9a3b3dc9399465426eeaaae7101360983d6c1a56b7846ea",
++    strip_prefix = "rules_ml_toolchain-5859ea7c33f8c608e4d231e1f49417262867320a",
++    urls = ["https://github.com/andersensam/rules_ml_toolchain/archive/5859ea7c33f8c608e4d231e1f49417262867320a.tar.gz"],
++)
++
++load(
++    "@rules_ml_toolchain//cc/deps:cc_toolchain_deps.bzl",
++    "cc_toolchain_deps",
++)
++
++cc_toolchain_deps()
++
++register_toolchains("@rules_ml_toolchain//cc:linux_x86_64_linux_x86_64")
++register_toolchains("@rules_ml_toolchain//cc:linux_x86_64_linux_x86_64_cuda")
++
++load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
++tf_workspace3()
++
++load("@xla//third_party/py:python_init_rules.bzl", "python_init_rules")
+ 
+ python_init_rules()
+ 
+-load("@org_tensorflow//third_party/xla/third_party/py:python_init_repositories.bzl", "python_init_repositories")
++load("@xla//third_party/py:python_init_repositories.bzl", "python_init_repositories")
+ 
+ python_init_repositories(
+     default_python_version = "system",
+@@ -129,11 +148,11 @@ python_init_repositories(
+     },
+ )
+ 
+-load("@org_tensorflow//third_party/xla/third_party/py:python_init_toolchains.bzl", "python_init_toolchains")
++load("@xla//third_party/py:python_init_toolchains.bzl", "python_init_toolchains")
+ 
+ python_init_toolchains()
+ 
+-load("@org_tensorflow//third_party/xla/third_party/py:python_init_pip.bzl", "python_init_pip")
++load("@xla//third_party/py:python_init_pip.bzl", "python_init_pip")
+ 
+ python_init_pip()
+ 
+@@ -141,17 +160,16 @@ load("@pypi//:requirements.bzl", "install_deps")
+ 
+ install_deps()
+ 
+-http_archive(
+-    name = "tsl",
+-    build_file = "//third_party:tsl.BUILD",
+-    sha256 = "370a84bd1c50fe7e36c46812f64d7697ed30fc3e78a5280e0ebf0611a88b4d3e",
+-    strip_prefix = "tsl-main",
+-    url = "https://github.com/andersensam/tsl/archive/refs/heads/main.zip",
++load(
++    "@xla//third_party/py:python_wheel.bzl",
++    "python_wheel_version_suffix_repository",
+ )
+ 
+-load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
++python_wheel_version_suffix_repository(name = "tf_wheel_version_suffix")
++
++
++
+ 
+-tf_workspace3()
+ 
+ load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
+ 
+@@ -166,7 +184,7 @@ load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
+ tf_workspace0()
+ 
+ load(
+-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_json_init_repository.bzl",
++    "@xla//third_party/gpus/cuda/hermetic:cuda_json_init_repository.bzl",
+     "cuda_json_init_repository",
+ )
+ 
+@@ -178,7 +196,7 @@ load(
+     "CUDNN_REDISTRIBUTIONS",
+ )
+ load(
+-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_redist_init_repositories.bzl",
++    "@xla//third_party/gpus/cuda/hermetic:cuda_redist_init_repositories.bzl",
+     "cuda_redist_init_repositories",
+     "cudnn_redist_init_repository",
+ )
+@@ -192,21 +210,21 @@ cudnn_redist_init_repository(
+ )
+ 
+ load(
+-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_configure.bzl",
++    "@xla//third_party/gpus/cuda/hermetic:cuda_configure.bzl",
+     "cuda_configure",
+ )
+ 
+ cuda_configure(name = "local_config_cuda")
+ 
+ load(
+-    "@org_tensorflow//third_party/nccl/hermetic:nccl_redist_init_repository.bzl",
++    "@xla//third_party/nccl/hermetic:nccl_redist_init_repository.bzl",
+     "nccl_redist_init_repository",
+ )
+ 
+ nccl_redist_init_repository()
+ 
+ load(
+-    "@org_tensorflow//third_party/nccl/hermetic:nccl_configure.bzl",
++    "@xla//third_party/nccl/hermetic:nccl_configure.bzl",
+     "nccl_configure",
+ )
+ 
+@@ -222,9 +240,12 @@ load("@org_tensorflow//third_party:repo.bzl", "tf_http_archive", "tf_mirror_urls
+ 
+ tf_http_archive(
+     name = "com_github_grpc_grpc",
+-    sha256 = "e11fd9b963c617de53d08a84f41359164b123f2e8e4180644706688fc9de43d9",
+-    strip_prefix = "grpc-1.73.1",
++    sha256 = "dd6a2fa311ba8441bbefd2764c55b99136ff10f7ea42954be96006a2723d33fc",
++    strip_prefix = "grpc-1.74.0",
+     #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
++    patch_cmds = [
++        "sed -i 's|X509_STORE_CTX_get0_chain(ctx)|ctx->chain|g' src/core/tsi/ssl_transport_security.cc",
++    ],
+     patch_file = [
+         "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
+         "@org_tensorflow//third_party/grpc:register_go_toolchain.patch",
+@@ -238,7 +259,7 @@ tf_http_archive(
+         "@org_tensorflow//third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
+         "@org_tensorflow//third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
+     },
+-    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.73.1.tar.gz")
++    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.74.0.tar.gz")
+ )
+ 
+ http_archive(
+@@ -709,6 +730,7 @@ http_archive(
+     build_file = "//third_party:liborc.BUILD",
+     patch_cmds = [
+         "tar -xzf c++/libs/libhdfspp/libhdfspp.tar.gz -C c++/libs/libhdfspp",
++        "find c++/src -type f \\( -name '*.cc' -o -name '*.hh' -o -name '*.h' \\) -exec sed -i 's|google::protobuf::int64|int64_t|g' {} +",
+     ],
+     sha256 = "39d983f4c7feb8ea1e8ab8e3e53e9afc643282b7a500b3a93c91aa6490f65c17",
+     strip_prefix = "orc-rel-release-1.6.14",
+@@ -729,7 +751,7 @@ http_archive(
+ )
+ 
+ http_archive(
+-    name = "libwebp",
++    name = "custom_libwebp",
+     build_file = "//third_party:libwebp.BUILD",
+     sha256 = "01bcde6a40a602294994050b81df379d71c40b7e39c819c024d079b3c56307f4",
+     strip_prefix = "libwebp-1.2.1",
+@@ -878,6 +900,10 @@ http_archive(
+ http_archive(
+     name = "pulsar",
+     build_file = "//third_party:pulsar.BUILD",
++    patch_cmds = [
++        "sed -i 's|descriptor->full_name()|std::string(descriptor->full_name())|g' lib/ProtobufNativeSchema.cc",
++        "sed -i 's|fileDescriptor->name()|std::string(fileDescriptor->name())|g' lib/ProtobufNativeSchema.cc",
++    ],
+     sha256 = "be97723dbba43045506f877cbc7600d2efe74264eace980933ae42b387069bc3",
+     strip_prefix = "pulsar-client-cpp-3.3.0",
+     urls = [
+@@ -973,7 +999,7 @@ http_archive(
+ )
+ 
+ http_archive(
+-    name = "xz",
++    name = "custom_xz",
+     build_file = "//third_party:xz.BUILD",
+     sha256 = "0d2b89629f13dd1a0602810529327195eff5f62a0142ccd65b903bc16a4ac78a",
+     strip_prefix = "xz-5.2.5",
+@@ -1078,3 +1104,5 @@ tf_http_archive(
+     system_build_file = "@org_tensorflow//third_party/systemlibs:jsoncpp.BUILD",
+     urls = tf_mirror_urls("https://github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz"),
+ )
++
++
+diff --git a/tensorflow_io/core/BUILD b/tensorflow_io/core/BUILD
+index 3f81f541..cab6dd7e 100644
+--- a/tensorflow_io/core/BUILD
++++ b/tensorflow_io/core/BUILD
+@@ -33,6 +33,9 @@ cc_library(
+     deps = [
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
+     ],
+     alwayslink = 1,
+ )
+@@ -48,6 +51,11 @@ cc_library(
+     deps = [
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -60,6 +68,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+     ],
+@@ -74,6 +87,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+     ],
+@@ -90,6 +108,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+     ],
+@@ -104,6 +127,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+     ],
+@@ -129,6 +157,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":arrow_util",
+         "//tensorflow_io/core:dataset_ops",
+         "@arrow",
+@@ -143,6 +176,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@arrow",
+     ],
+@@ -164,6 +202,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":bigquery_lib_cc",
+         "@arrow",
+         "@avro",
+@@ -194,10 +237,16 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@com_github_googleapis_google_cloud_cpp//:bigtable_client",
+         "@com_github_grpc_grpc//:grpc++",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
++        "//third_party:tirpc",
+     ],
+     alwayslink = 1,
+ )
+@@ -210,6 +259,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:arrow_util",
+         "@arrow",
+         "@avro",
+@@ -235,6 +289,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":dataset_ops",
+         "@curl",
+         "@libarchive",
+@@ -249,6 +308,11 @@ go_binary(
+     linkmode = "c-archive",
+     visibility = ["//visibility:public"],
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@com_github_prometheus_client_golang//api:go_default_library",
+         "@com_github_prometheus_client_golang//api/prometheus/v1:go_default_library",
+         "@com_github_prometheus_client_model//go:go_default_library",
+@@ -262,6 +326,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:golang_ops.cc",
+     ],
+     alwayslink = 1,
+@@ -278,6 +347,11 @@ cc_library(
+     deps = [
+         "//tensorflow_io/core:dataset_ops",
+         "@lmdb",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -291,6 +365,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "//tensorflow_io/core:go_ops",
+     ],
+@@ -306,6 +385,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "//tensorflow_io/core:sequence_ops",
+         "@curl",
+@@ -328,6 +412,11 @@ cc_library(
+         "//tensorflow_io/core:dataset_ops",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -354,6 +443,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "//third_party:font",
+         "@com_google_absl//absl/algorithm",
+@@ -367,7 +461,7 @@ cc_library(
+         "@libavif",
+         "@libgeotiff",
+         "@libtiff",
+-        "@libwebp",
++        "@custom_libwebp//:libwebp",
+         "@libyuv",
+         "@openexr",
+         "@openjpeg",
+@@ -399,6 +493,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@flac",
+         "@minimp3",
+         "@speexdsp",
+@@ -425,6 +524,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@ffmpeg_4_2//:ffmpeg",
+     ],
+@@ -442,6 +546,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@ffmpeg_3_4//:ffmpeg",
+     ],
+@@ -458,6 +567,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@ffmpeg_2_8//:ffmpeg",
+     ],
+@@ -480,6 +594,11 @@ cc_library(
+     deps = [
+         "//tensorflow_io/core:dataset_ops",
+         "//tensorflow_io/core/kernels/avro/utils:avro_utils",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -510,6 +629,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":avro_ops",
+         "@avro",
+         "@local_config_tf//:libtensorflow_framework",
+@@ -533,6 +657,11 @@ cc_library(
+     ],
+     copts = tf_io_copts(),
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":avro_atds",
+         "//tensorflow_io/core:avro_ops",
+         "@com_google_googletest//:gtest_main",
+@@ -548,6 +677,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@liborc",
+         "@local_config_tf//:libtensorflow_framework",
+@@ -570,6 +704,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":arrow_ops",
+         "//tensorflow_io/core:dataset_ops",
+         "//tensorflow_io/core:output_ops",
+@@ -588,6 +727,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@hdf5",
+     ],
+@@ -603,6 +747,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":arrow_ops",
+         "//tensorflow_io/core:dataset_ops",
+     ],
+@@ -618,6 +767,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@com_github_grpc_grpc//:grpc++",
+         "@com_google_absl//absl/time",
+@@ -635,6 +789,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@aws-sdk-cpp//:kinesis",
+     ],
+@@ -651,6 +810,11 @@ cc_library(
+     linkstatic = True,
+     deps = [
+         "//tensorflow_io/core:dataset_ops",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -664,6 +828,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@avro",
+         "@rapidjson",
+@@ -680,6 +849,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "//tensorflow_io/core/grpc:endpoint_cc_grpc",
+         "@com_github_grpc_grpc//:grpc++",
+@@ -700,6 +874,11 @@ cc_library(
+         "//tensorflow_io/core:dataset_ops",
+         "@arrow",
+         "@rapidjson",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -715,6 +894,11 @@ cc_library(
+     deps = [
+         "//tensorflow_io/core:dataset_ops",
+         "@zlib",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -730,6 +914,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "//tensorflow_io/core:sequence_ops",
+         "@avro",
+@@ -759,6 +948,11 @@ cc_library(
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+         "@postgresql",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+@@ -772,6 +966,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+         "@pulsar",
+@@ -788,6 +987,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@libmongoc",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+@@ -804,6 +1008,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+         "@tinyobjloader",
+@@ -822,6 +1031,15 @@ cc_library(
+     deps = [
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
++
++
++
++
+diff --git a/tensorflow_io/core/filesystems/BUILD b/tensorflow_io/core/filesystems/BUILD
+index cd5fa018..32d90196 100644
+--- a/tensorflow_io/core/filesystems/BUILD
++++ b/tensorflow_io/core/filesystems/BUILD
+@@ -22,6 +22,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@local_config_tf//:tf_c_header_lib",
+         "@local_config_tf//:tf_tsl_header_lib",
+     ],
+@@ -36,6 +41,11 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core/filesystems/az",
+         "//tensorflow_io/core/filesystems/hdfs",
+         "//tensorflow_io/core/filesystems/http",
+diff --git a/tensorflow_io/core/filesystems/az/BUILD b/tensorflow_io/core/filesystems/az/BUILD
+index f14c860b..3342c48e 100644
+--- a/tensorflow_io/core/filesystems/az/BUILD
++++ b/tensorflow_io/core/filesystems/az/BUILD
+@@ -15,11 +15,17 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core/filesystems:filesystem_plugins_header",
+         "@com_github_azure_azure_sdk_for_cpp//:azure",
+         "@com_google_absl//absl/strings",
+-        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
+-        "@org_tensorflow//tensorflow/c:logging",
++        "@com_google_absl//absl/strings:str_format",
++        "@xla//xla/tsl/platform:status",
++        "@xla//xla/tsl/platform:logging",
+         "@org_tensorflow//tensorflow/c:tf_file_statistics",
+         "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+     ],
+diff --git a/tensorflow_io/core/filesystems/az/az_filesystem.cc b/tensorflow_io/core/filesystems/az/az_filesystem.cc
+index b2609e3e..8498c649 100644
+--- a/tensorflow_io/core/filesystems/az/az_filesystem.cc
++++ b/tensorflow_io/core/filesystems/az/az_filesystem.cc
+@@ -1,3 +1,6 @@
++#include <iostream>
++#include "absl/log/log.h"
++#include "absl/strings/str_format.h"
+ /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -29,7 +32,7 @@ limitations under the License.
+ #include "absl/strings/strip.h"
+ #include "azure/storage/blobs/blob_container_client.hpp"
+ #include "azure/storage/blobs/block_blob_client.hpp"
+-#include "tensorflow/c/logging.h"
++
+ #include "tensorflow/c/tf_status.h"
+ #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
+ 
+@@ -216,7 +219,7 @@ std::string StorageExceptionInfo(const Azure::Storage::StorageException& e) {
+ void ListResources(const std::string& dir, const std::string& delimiter,
+                    Azure::Storage::Blobs::BlobContainerClient& blob_client,
+                    std::vector<std::string>* results, TF_Status* status) {
+-  TF_VLog(1, "ListResources: %s\n", dir.c_str());
++  LOG(INFO) << absl::StrFormat("ListResources: %s\n", dir.c_str());
+   if (!results) {
+     TF_SetStatus(status, TF_INTERNAL, "results cannot be null");
+     return;
+@@ -269,7 +272,7 @@ class AzBlobRandomAccessFile {
+   ~AzBlobRandomAccessFile() {}
+   int64_t Read(uint64_t offset, size_t n, char* buffer,
+                TF_Status* status) const {
+-    TF_VLog(1, "ReadFileFromAz az://%s/%s/%s from %u for n: %u\n",
++    LOG(INFO) << absl::StrFormat("ReadFileFromAz az://%s/%s/%s from %u for n: %u\n",
+             account_.c_str(), container_.c_str(), object_.c_str(), offset, n);
+     // If n == 0, then return OkStatus()
+     // otherwise, if bytes_read < n then return OutofRange
+@@ -385,7 +388,7 @@ class AzBlobWritableFile {
+       return;
+     }
+ 
+-    TF_VLog(1, "WriteFileToAz: az://%s/%s/%s\n", account_.c_str(),
++    LOG(INFO) << absl::StrFormat("WriteFileToAz: az://%s/%s/%s\n", account_.c_str(),
+             container_.c_str(), object_.c_str());
+ 
+     auto blob_container_client =
+@@ -583,7 +586,7 @@ static void NewReadOnlyMemoryRegionFromFile(const TF_Filesystem* filesystem,
+ 
+ static void CreateDir(const TF_Filesystem* filesystem, const char* path,
+                       TF_Status* status) {
+-  TF_VLog(1, "CreateDir %s\n", path);
++  LOG(INFO) << absl::StrFormat("CreateDir %s\n", path);
+   std::string account, container, object;
+   ParseAzBlobPath(path, true, &account, &container, &object, status);
+   if (TF_GetCode(status) != TF_OK) {
+@@ -610,7 +613,7 @@ static void RecursivelyCreateDir(const TF_Filesystem* filesystem,
+ 
+ static void DeleteFile(const TF_Filesystem* filesystem, const char* path,
+                        TF_Status* status) {
+-  TF_VLog(1, "DeleteFile %s\n", path);
++  LOG(INFO) << absl::StrFormat("DeleteFile %s\n", path);
+   std::string account, container, object;
+   ParseAzBlobPath(path, false, &account, &container, &object, status);
+   if (TF_GetCode(status) != TF_OK) {
+@@ -634,7 +637,7 @@ static void DeleteFile(const TF_Filesystem* filesystem, const char* path,
+ 
+ static void DeleteDir(const TF_Filesystem* filesystem, const char* path,
+                       TF_Status* status) {
+-  TF_VLog(1, "DeleteDir %s\n", path);
++  LOG(INFO) << absl::StrFormat("DeleteDir %s\n", path);
+ 
+   std::string account, container, object;
+   ParseAzBlobPath(path, false, &account, &container, &object, status);
+@@ -712,7 +715,7 @@ static void DeleteRecursively(const TF_Filesystem* filesystem, const char* path,
+ 
+ static void RenameFile(const TF_Filesystem* filesystem, const char* src,
+                        const char* dst, TF_Status* status) {
+-  TF_VLog(1, "RenameFile from: %s to %s\n", src, dst);
++  LOG(INFO) << absl::StrFormat("RenameFile from: %s to %s\n", src, dst);
+   std::string src_account, src_container, src_object;
+   ParseAzBlobPath(src, false, &src_account, &src_container, &src_object,
+                   status);
+@@ -785,7 +788,7 @@ static void RenameFile(const TF_Filesystem* filesystem, const char* src,
+ 
+ static void CopyFile(const TF_Filesystem* filesystem, const char* src,
+                      const char* dst, TF_Status* status) {
+-  TF_VLog(1, "CopyFile from: %s to %s\n", src, dst);
++  LOG(INFO) << absl::StrFormat("CopyFile from: %s to %s\n", src, dst);
+   // 128KB copy buffer
+   constexpr size_t kCopyFileBufferSize = 128 * 1024;
+ 
+@@ -827,7 +830,7 @@ static void CopyFile(const TF_Filesystem* filesystem, const char* src,
+ 
+ static void PathExists(const TF_Filesystem* filesystem, const char* path,
+                        TF_Status* status) {
+-  TF_VLog(1, "PathExists on path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("PathExists on path: %s\n", path);
+   std::string account, container, object;
+   ParseAzBlobPath(path, false, &account, &container, &object, status);
+   if (TF_GetCode(status) != TF_OK) {
+@@ -858,7 +861,7 @@ static void PathExists(const TF_Filesystem* filesystem, const char* path,
+ 
+ static bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
+                         TF_Status* status) {
+-  TF_VLog(1, "IsDirectory on path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("IsDirectory on path: %s\n", path);
+   // Should check that account and container exist and that fname isn't a file
+   // Azure storage file system is virtual and is created with path compenents in
+   // blobs name so no need to check further
+@@ -928,7 +931,7 @@ static bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
+ 
+ static void Stat(const TF_Filesystem* filesystem, const char* path,
+                  TF_FileStatistics* stats, TF_Status* status) {
+-  TF_VLog(1, "Stat on path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("Stat on path: %s\n", path);
+ 
+   using namespace std::chrono;
+ 
+@@ -972,7 +975,7 @@ static void Stat(const TF_Filesystem* filesystem, const char* path,
+ 
+ static int GetChildren(const TF_Filesystem* filesystem, const char* path,
+                        char*** entries, TF_Status* status) {
+-  TF_VLog(1, "GetChildren on path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("GetChildren on path: %s\n", path);
+   std::string account, container, object;
+   ParseAzBlobPath(path, true, &account, &container, &object, status);
+   if (TF_GetCode(status) != TF_OK) {
+@@ -1038,7 +1041,7 @@ static int GetChildren(const TF_Filesystem* filesystem, const char* path,
+ 
+ static int64_t GetFileSize(const TF_Filesystem* filesystem, const char* path,
+                            TF_Status* status) {
+-  TF_VLog(1, "GetFileSize on path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("GetFileSize on path: %s\n", path);
+   std::string account, container, object;
+   ParseAzBlobPath(path, false, &account, &container, &object, status);
+   if (TF_GetCode(status) != TF_OK) {
+diff --git a/tensorflow_io/core/filesystems/hdfs/BUILD b/tensorflow_io/core/filesystems/hdfs/BUILD
+index 97c6d847..8db519fc 100644
+--- a/tensorflow_io/core/filesystems/hdfs/BUILD
++++ b/tensorflow_io/core/filesystems/hdfs/BUILD
+@@ -15,12 +15,17 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core/filesystems:filesystem_plugins_header",
+         "@com_google_absl//absl/strings",
+         "@com_google_absl//absl/synchronization",
+         "@hadoop",
+-        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
+-        "@org_tensorflow//tensorflow/c:logging",
++        "@xla//xla/tsl/platform:status",
++        "@xla//xla/tsl/platform:logging",
+         "@org_tensorflow//tensorflow/c:c_api_macros",
+         "@org_tensorflow//tensorflow/c:tf_file_statistics",
+         "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+diff --git a/tensorflow_io/core/filesystems/hdfs/hadoop_filesystem.cc b/tensorflow_io/core/filesystems/hdfs/hadoop_filesystem.cc
+index 3d5a41b8..3638c147 100644
+--- a/tensorflow_io/core/filesystems/hdfs/hadoop_filesystem.cc
++++ b/tensorflow_io/core/filesystems/hdfs/hadoop_filesystem.cc
+@@ -1,3 +1,5 @@
++#include "absl/log/log.h"
++#include "absl/strings/str_format.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -31,7 +33,7 @@ limitations under the License.
+ #include "absl/strings/str_cat.h"
+ #include "absl/synchronization/mutex.h"
+ #include "hdfs/hdfs.h"
+-#include "tensorflow/c/logging.h"
++
+ #include "tensorflow/c/tf_status.h"
+ #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
+ 
+@@ -241,7 +243,7 @@ class LibHDFS {
+       if (TF_GetCode(status) == TF_OK) {
+         return;
+       } else {
+-        TF_Log(TF_ERROR, "HadoopFileSystem load error: %s", TF_Message(status));
++        LOG(ERROR) << "HadoopFileSystem load error: " << TF_Message(status);
+       }
+     }
+ 
+diff --git a/tensorflow_io/core/filesystems/http/BUILD b/tensorflow_io/core/filesystems/http/BUILD
+index c1c11b8b..1b01440e 100644
+--- a/tensorflow_io/core/filesystems/http/BUILD
++++ b/tensorflow_io/core/filesystems/http/BUILD
+@@ -15,13 +15,18 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core/filesystems:filesystem_plugins_header",
+         "@com_google_absl//absl/strings",
+         "@com_google_absl//absl/synchronization",
+         "@com_google_absl//absl/time",
+         "@curl",
+-        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
+-        "@org_tensorflow//tensorflow/c:logging",
++        "@xla//xla/tsl/platform:status",
++        "@xla//xla/tsl/platform:logging",
+         "@org_tensorflow//tensorflow/c:c_api_macros",
+         "@org_tensorflow//tensorflow/c:tf_file_statistics",
+         "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+diff --git a/tensorflow_io/core/filesystems/http/http_filesystem.cc b/tensorflow_io/core/filesystems/http/http_filesystem.cc
+index 7c1a0108..35664c76 100644
+--- a/tensorflow_io/core/filesystems/http/http_filesystem.cc
++++ b/tensorflow_io/core/filesystems/http/http_filesystem.cc
+@@ -1,3 +1,5 @@
++#include "absl/log/log.h"
++#include "absl/strings/str_format.h"
+ /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -22,7 +24,7 @@ limitations under the License.
+ #include "absl/strings/ascii.h"
+ #include "absl/strings/str_cat.h"
+ #include "absl/synchronization/mutex.h"
+-#include "tensorflow/c/logging.h"
++
+ #include "tensorflow/c/tf_status.h"
+ #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
+ 
+@@ -489,7 +491,7 @@ class CurlHttpRequest {
+           curl_easy_strerror(pretransfer_time_status),
+           "), start-transfer time: ", starttransfer_time, " (",
+           curl_easy_strerror(starttransfer_time_status), ")");
+-      TF_Log(TF_ERROR, error_message.c_str());
++      LOG(ERROR) << error_message;
+       return 1;  // Will abort the request.
+     }
+     // No progress was made since the last call, but we should wait a bit
+diff --git a/tensorflow_io/core/filesystems/oss/BUILD b/tensorflow_io/core/filesystems/oss/BUILD
+index f25b4e81..62264c03 100644
+--- a/tensorflow_io/core/filesystems/oss/BUILD
++++ b/tensorflow_io/core/filesystems/oss/BUILD
+@@ -19,6 +19,11 @@ cc_library(
+         "//tensorflow_io/core/filesystems:filesystem_plugins_header",
+         "@aliyun_oss_c_sdk",
+         "@local_config_tf//:tf_header_lib",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+     alwayslink = 1,
+ )
+diff --git a/tensorflow_io/core/filesystems/s3/BUILD b/tensorflow_io/core/filesystems/s3/BUILD
+index 6a6445d2..cab296b3 100644
+--- a/tensorflow_io/core/filesystems/s3/BUILD
++++ b/tensorflow_io/core/filesystems/s3/BUILD
+@@ -18,13 +18,19 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core/filesystems:filesystem_plugins_header",
+         "@aws-sdk-cpp//:s3",
+         "@aws-sdk-cpp//:transfer",
+         "@com_google_absl//absl/strings",
++        "@com_google_absl//absl/strings:str_format",
+         "@com_google_absl//absl/synchronization",
+-        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
+-        "@org_tensorflow//tensorflow/c:logging",
++        "@xla//xla/tsl/platform:status",
++        "@xla//xla/tsl/platform:logging",
+         "@org_tensorflow//tensorflow/c:c_api_macros",
+         "@org_tensorflow//tensorflow/c:tf_file_statistics",
+         "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+diff --git a/tensorflow_io/core/filesystems/s3/aws_logging.cc b/tensorflow_io/core/filesystems/s3/aws_logging.cc
+index 7f09c193..acadb8b1 100644
+--- a/tensorflow_io/core/filesystems/s3/aws_logging.cc
++++ b/tensorflow_io/core/filesystems/s3/aws_logging.cc
+@@ -1,3 +1,4 @@
++#include "absl/log/log.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -13,6 +14,7 @@ See the License for the specific language governing permissions and
+ limitations under the License.
+ ==============================================================================*/
+ #include "tensorflow_io/core/filesystems/s3/aws_logging.h"
++#include "absl/strings/str_format.h"
+ 
+ #include <aws/core/Aws.h>
+ #include <aws/core/utils/logging/AWSLogging.h>
+@@ -23,7 +25,7 @@ limitations under the License.
+ #include <sstream>
+ 
+ #include "absl/synchronization/mutex.h"
+-#include "tensorflow/c/logging.h"
++
+ 
+ namespace tensorflow {
+ namespace io {
+@@ -56,20 +58,20 @@ void AWSLogSystem::LogMessage(Aws::Utils::Logging::LogLevel log_level,
+   if (message == "Initializing Curl library") return;
+   switch (log_level) {
+     case Aws::Utils::Logging::LogLevel::Info:
+-      TF_Log(TF_INFO, message.c_str());
++      LOG(INFO) << message;
+       break;
+     case Aws::Utils::Logging::LogLevel::Warn:
+-      TF_Log(TF_WARNING, message.c_str());
++      LOG(ERROR) << message;
+       break;
+     case Aws::Utils::Logging::LogLevel::Error:
+-      TF_Log(TF_ERROR, message.c_str());
++      LOG(ERROR) << message;
+       break;
+     case Aws::Utils::Logging::LogLevel::Fatal:
+-      TF_Log(TF_FATAL, message.c_str());
++      LOG(ERROR) << message;
+       break;
+     default:
+       // this will match for DEBUG, TRACE
+-      TF_Log(TF_INFO, message.c_str());
++      LOG(INFO) << message;
+       break;
+   }
+ }
+diff --git a/tensorflow_io/core/filesystems/s3/s3_filesystem.cc b/tensorflow_io/core/filesystems/s3/s3_filesystem.cc
+index 65426953..ec61936c 100644
+--- a/tensorflow_io/core/filesystems/s3/s3_filesystem.cc
++++ b/tensorflow_io/core/filesystems/s3/s3_filesystem.cc
+@@ -1,3 +1,7 @@
++#include <iostream>
++#include "absl/log/log.h"
++#include "absl/strings/str_format.h"
++#include "absl/log/log.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -36,7 +40,7 @@ limitations under the License.
+ #include "absl/strings/ascii.h"
+ #include "absl/strings/numbers.h"
+ #include "absl/strings/str_cat.h"
+-#include "tensorflow/c/logging.h"
++
+ #include "tensorflow/c/tf_status.h"
+ #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
+ #include "tensorflow_io/core/filesystems/s3/aws_logging.h"
+@@ -288,7 +292,7 @@ void Cleanup(TF_RandomAccessFile* file) {
+ 
+ static int64_t ReadS3Client(S3File* s3_file, uint64_t offset, size_t n,
+                             char* buffer, TF_Status* status) {
+-  TF_VLog(3, "ReadFile using S3Client\n");
++  LOG(INFO) << absl::StrFormat("ReadFile using S3Client\n");
+   Aws::S3::Model::GetObjectRequest get_object_request;
+   get_object_request.WithBucket(s3_file->bucket).WithKey(s3_file->object);
+   Aws::String bytes =
+@@ -314,13 +318,13 @@ static int64_t ReadS3Client(S3File* s3_file, uint64_t offset, size_t n,
+ 
+ static int64_t ReadS3TransferManager(S3File* s3_file, uint64_t offset, size_t n,
+                                      char* buffer, TF_Status* status) {
+-  TF_VLog(3, "Using TransferManager\n");
++  LOG(INFO) << absl::StrFormat("Using TransferManager\n");
+   auto stream_buf = Aws::MakeShared<Aws::Utils::Stream::PreallocatedStreamBuf>(
+       "S3StreamBuf", reinterpret_cast<unsigned char*>(buffer), n);
+   auto create_download_stream = [stream_buf]() {
+     return Aws::New<TFS3UnderlyingStream>("S3ReadStream", stream_buf.get());
+   };
+-  TF_VLog(3, "Created stream to read with transferManager\n");
++  LOG(INFO) << absl::StrFormat("Created stream to read with transferManager\n");
+   auto handle = s3_file->transfer_manager->DownloadFile(
+       s3_file->bucket, s3_file->object, offset, n, create_download_stream);
+   handle->WaitUntilFinished();
+@@ -331,9 +335,7 @@ static int64_t ReadS3TransferManager(S3File* s3_file, uint64_t offset, size_t n,
+              Aws::Http::HttpResponseCode::REQUESTED_RANGE_NOT_SATISFIABLE &&
+          retries++ < kDownloadRetries) {
+     // Only failed parts will be downloaded again.
+-    TF_VLog(
+-        1,
+-        "Retrying read of s3://%s/%s after failure. Current retry count: %u\n",
++    LOG(INFO) << absl::StrFormat("Retrying read of s3://%s/%s after failure. Current retry count: %u\n",
+         s3_file->bucket.c_str(), s3_file->object.c_str(), retries);
+     s3_file->transfer_manager->RetryDownload(handle);
+     handle->WaitUntilFinished();
+@@ -354,7 +356,7 @@ static int64_t ReadS3TransferManager(S3File* s3_file, uint64_t offset, size_t n,
+ int64_t Read(const TF_RandomAccessFile* file, uint64_t offset, size_t n,
+              char* buffer, TF_Status* status) {
+   auto s3_file = static_cast<S3File*>(file->plugin_file);
+-  TF_VLog(1, "ReadFilefromS3 s3://%s/%s from %u for n: %u\n",
++  LOG(INFO) << absl::StrFormat("ReadFilefromS3 s3://%s/%s from %u for n: %u\n",
+           s3_file->bucket.c_str(), s3_file->object.c_str(), offset, n);
+   if (s3_file->use_multi_part_download)
+     return ReadS3TransferManager(s3_file, offset, n, buffer, status);
+@@ -440,7 +442,7 @@ void Sync(const TF_WritableFile* file, TF_Status* status) {
+     TF_SetStatus(status, TF_OK, "");
+     return;
+   }
+-  TF_VLog(1, "WriteFileToS3: s3://%s/%s\n", s3_file->bucket.c_str(),
++  LOG(INFO) << absl::StrFormat("WriteFileToS3: s3://%s/%s\n", s3_file->bucket.c_str(),
+           s3_file->object.c_str());
+   auto position = static_cast<int64_t>(s3_file->outfile->tellp());
+   // We always re-upload the whole file.
+@@ -454,8 +456,7 @@ void Sync(const TF_WritableFile* file, TF_Status* status) {
+   while (handle->GetStatus() == Aws::Transfer::TransferStatus::FAILED &&
+          retries++ < kUploadRetries) {
+     // if multipart upload was used, only the failed parts will be re-sent
+-    TF_VLog(1,
+-            "Retrying upload of s3://%s/%s after failure. Current retry count: "
++    LOG(INFO) << absl::StrFormat("Retrying upload of s3://%s/%s after failure. Current retry count: "
+             "%u\n",
+             s3_file->bucket.c_str(), s3_file->object.c_str(), retries);
+     s3_file->transfer_manager->RetryUpload(s3_file->outfile, handle);
+@@ -628,7 +629,7 @@ void NewAppendableFile(const TF_Filesystem* filesystem, const char* path,
+ 
+ void Stat(const TF_Filesystem* filesystem, const char* path,
+           TF_FileStatistics* stats, TF_Status* status) {
+-  TF_VLog(1, "Stat on path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("Stat on path: %s\n", path);
+   Aws::String bucket, object;
+   ParseS3Path(path, true, &bucket, &object, status);
+   if (TF_GetCode(status) != TF_OK) return;
+@@ -753,7 +754,7 @@ static void SimpleCopyFile(const Aws::String& source,
+                            const Aws::String& bucket_dst,
+                            const Aws::String& object_dst, S3File* s3_file,
+                            TF_Status* status) {
+-  TF_VLog(1, "SimpleCopyFile from %s to %s/%s\n", source.c_str(),
++  LOG(INFO) << absl::StrFormat("SimpleCopyFile from %s to %s/%s\n", source.c_str(),
+           bucket_dst.c_str(), object_dst.c_str());
+   Aws::S3::Model::CopyObjectRequest copy_object_request;
+   copy_object_request.WithCopySource(source)
+@@ -819,7 +820,7 @@ static void MultiPartCopy(const Aws::String& source,
+                           const Aws::String& object_dst, const size_t num_parts,
+                           const uint64_t file_size, S3File* s3_file,
+                           TF_Status* status) {
+-  TF_VLog(1, "MultiPartCopy from %s to %s/%s\n", source.c_str(),
++  LOG(INFO) << absl::StrFormat("MultiPartCopy from %s to %s/%s\n", source.c_str(),
+           bucket_dst.c_str(), object_dst.c_str());
+   Aws::S3::Model::CreateMultipartUploadRequest create_multipart_upload_request;
+   create_multipart_upload_request.WithBucket(bucket_dst).WithKey(object_dst);
+@@ -846,7 +847,7 @@ static void MultiPartCopy(const Aws::String& source,
+   auto chunk_size =
+       s3_file->multi_part_chunk_sizes[Aws::Transfer::TransferDirection::UPLOAD];
+ 
+-  TF_VLog(1, "Copying from %s in %u parts of size %u each\n", source.c_str(),
++  LOG(INFO) << absl::StrFormat("Copying from %s in %u parts of size %u each\n", source.c_str(),
+           num_parts, chunk_size);
+   size_t retries = 0;
+   while (retries++ < 3) {
+@@ -912,9 +913,7 @@ static void MultiPartCopy(const Aws::String& source,
+                                           status);
+         } else {
+           // Retry.
+-          TF_Log(TF_ERROR,
+-                 "Retrying failed copy of part %u due to an error with S3\n",
+-                 part_number);
++          LOG(ERROR) << absl::StrFormat("Retrying failed copy of part %d due to an error with S3", part_number);
+           num_finished_parts--;
+         }
+       }
+@@ -992,7 +991,7 @@ void CopyFile(const TF_Filesystem* filesystem, const char* src, const char* dst,
+ 
+ void DeleteFile(const TF_Filesystem* filesystem, const char* path,
+                 TF_Status* status) {
+-  TF_VLog(1, "DeleteFile: %s\n", path);
++  LOG(INFO) << absl::StrFormat("DeleteFile: %s\n", path);
+   Aws::String bucket, object;
+   ParseS3Path(path, false, &bucket, &object, status);
+   if (TF_GetCode(status) != TF_OK) return;
+@@ -1011,7 +1010,7 @@ void DeleteFile(const TF_Filesystem* filesystem, const char* path,
+ 
+ void CreateDir(const TF_Filesystem* filesystem, const char* path,
+                TF_Status* status) {
+-  TF_VLog(1, "CreateDir: %s\n", path);
++  LOG(INFO) << absl::StrFormat("CreateDir: %s\n", path);
+   Aws::String bucket, object;
+   ParseS3Path(path, true, &bucket, &object, status);
+   if (TF_GetCode(status) != TF_OK) return;
+@@ -1058,7 +1057,7 @@ void RecursivelyCreateDir(const TF_Filesystem* filesystem, const char* path,
+ 
+ void DeleteDir(const TF_Filesystem* filesystem, const char* path,
+                TF_Status* status) {
+-  TF_VLog(1, "DeleteDir: %s\n", path);
++  LOG(INFO) << absl::StrFormat("DeleteDir: %s\n", path);
+   Aws::String bucket, object;
+   ParseS3Path(path, false, &bucket, &object, status);
+   if (TF_GetCode(status) != TF_OK) return;
+@@ -1093,7 +1092,7 @@ void DeleteDir(const TF_Filesystem* filesystem, const char* path,
+ 
+ void RenameFile(const TF_Filesystem* filesystem, const char* src,
+                 const char* dst, TF_Status* status) {
+-  TF_VLog(1, "RenameFile from: %s to %s\n", src, dst);
++  LOG(INFO) << absl::StrFormat("RenameFile from: %s to %s\n", src, dst);
+   Aws::String bucket_src, object_src;
+   ParseS3Path(src, false, &bucket_src, &object_src, status);
+   if (TF_GetCode(status) != TF_OK) return;
+@@ -1155,7 +1154,7 @@ void RenameFile(const TF_Filesystem* filesystem, const char* src,
+ 
+ int GetChildren(const TF_Filesystem* filesystem, const char* path,
+                 char*** entries, TF_Status* status) {
+-  TF_VLog(1, "GetChildren for path: %s\n", path);
++  LOG(INFO) << absl::StrFormat("GetChildren for path: %s\n", path);
+   Aws::String bucket, prefix;
+   ParseS3Path(path, true, &bucket, &prefix, status);
+   if (TF_GetCode(status) != TF_OK) return -1;
+diff --git a/tensorflow_io/core/kernels/audio_video_flac_kernels.cc b/tensorflow_io/core/kernels/audio_video_flac_kernels.cc
+index 8c12d9e8..35c9bd4b 100644
+--- a/tensorflow_io/core/kernels/audio_video_flac_kernels.cc
++++ b/tensorflow_io/core/kernels/audio_video_flac_kernels.cc
+@@ -1,3 +1,4 @@
++#include "absl/strings/str_format.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -164,7 +165,7 @@ class FlacStreamDecoder {
+   static void ErrorCallback(const FLAC__StreamDecoder* decoder,
+                             FLAC__StreamDecoderErrorStatus status,
+                             void* client_data) {
+-    std::cerr << "ErrorCallback: " << std::endl;
++    LOG(ERROR) << "ErrorCallback: ";
+   }
+ 
+   SizedRandomAccessFile* file;
+diff --git a/tensorflow_io/core/kernels/avro/utils/BUILD b/tensorflow_io/core/kernels/avro/utils/BUILD
+index 99f2b0d4..02c1da1c 100644
+--- a/tensorflow_io/core/kernels/avro/utils/BUILD
++++ b/tensorflow_io/core/kernels/avro/utils/BUILD
+@@ -21,6 +21,11 @@ cc_library(
+     ],
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io/core:dataset_ops",
+         "@com_googlesource_code_re2//:re2",
+     ],
+@@ -41,5 +46,10 @@ cc_library(
+     deps = [
+         ":avro_utils_api",
+         "@avro",
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+     ],
+ )
+diff --git a/tensorflow_io/core/kernels/bigquery/bigquery_lib.h b/tensorflow_io/core/kernels/bigquery/bigquery_lib.h
+index d4b9305d..3ad27d0c 100644
+--- a/tensorflow_io/core/kernels/bigquery/bigquery_lib.h
++++ b/tensorflow_io/core/kernels/bigquery/bigquery_lib.h
+@@ -73,7 +73,7 @@ class BigQueryClientResource : public ResourceBase {
+           grpc::ChannelArguments args;
+           args.SetMaxReceiveMessageSize(kMaxReceiveMessageSize);
+           args.SetUserAgentPrefix(
+-              strings::StrCat("tensorflow-", TF_VERSION_STRING));
++              strings::StrCat("tensorflow-", "2.21.0"));
+           args.SetInt(GRPC_ARG_KEEPALIVE_PERMIT_WITHOUT_CALLS, 0);
+           args.SetInt(GRPC_ARG_KEEPALIVE_TIMEOUT_MS, 60 * 1000);
+           // To prevent gRPC from reusing channel
+diff --git a/tensorflow_io/core/kernels/gsmemcachedfs/BUILD b/tensorflow_io/core/kernels/gsmemcachedfs/BUILD
+index 5148836b..78b3ce49 100644
+--- a/tensorflow_io/core/kernels/gsmemcachedfs/BUILD
++++ b/tensorflow_io/core/kernels/gsmemcachedfs/BUILD
+@@ -14,6 +14,11 @@ cc_library(
+     linkstatic = True,
+     visibility = ["//visibility:public"],
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@libmemcached",
+     ],
+ )
+@@ -26,6 +31,11 @@ cc_library(
+     linkstatic = True,
+     visibility = ["//visibility:public"],
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":memcached_dao_interfaces",
+         "@com_google_absl//absl/container:flat_hash_map",
+         "@farmhash_archive//:farmhash",
+@@ -46,6 +56,11 @@ cc_library(
+     linkstatic = True,
+     visibility = ["//visibility:public"],
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@com_google_absl//absl/memory",
+         "@local_config_tf//:libtensorflow_framework",
+         "@local_config_tf//:tf_header_lib",
+@@ -60,6 +75,11 @@ cc_library(
+     linkstatic = True,
+     visibility = ["//visibility:public"],
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":gce_memcached_server_list_provider",
+         ":memcached_file_block_cache",
+         "@com_google_absl//absl/memory",
+@@ -76,6 +96,11 @@ cc_library(
+     linkstatic = 1,  # Needed since alwayslink is broken in bazel b/27630669
+     visibility = ["//visibility:public"],
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         ":gce_memcached_server_list_provider",
+         ":memcached_file_system",
+         "@com_google_absl//absl/memory",
+diff --git a/tensorflow_io/python/ops/version_ops.py b/tensorflow_io/python/ops/version_ops.py
+index 19718797..cb726f60 100644
+--- a/tensorflow_io/python/ops/version_ops.py
++++ b/tensorflow_io/python/ops/version_ops.py
+@@ -14,5 +14,5 @@
+ # ==============================================================================
+ """version_ops"""
+ 
+-version = "0.37.3"
+-require = "tensorflow>=2.19.1.2,<2.20"
++version = "0.37.4"
++require = "tensorflow>=2.21.0.1,<2.22"
+diff --git a/tensorflow_io_gcs_filesystem/core/BUILD b/tensorflow_io_gcs_filesystem/core/BUILD
+index 9e812edb..9aca7d4d 100644
+--- a/tensorflow_io_gcs_filesystem/core/BUILD
++++ b/tensorflow_io_gcs_filesystem/core/BUILD
+@@ -30,19 +30,26 @@ cc_library(
+     copts = tf_io_copts(),
+     linkstatic = True,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "@com_github_googleapis_google_cloud_cpp//:storage_client",
+         "@com_google_absl//absl/base:core_headers",
+         "@com_google_absl//absl/strings",
++        "@com_google_absl//absl/strings:str_format",
++        "@org_tensorflow//tensorflow/c:env",
+         "@com_google_absl//absl/synchronization",
+         "@com_google_absl//absl/types:variant",
+         "@local_config_tf//:tf_c_header_lib",
+         "@local_config_tf//:tf_tsl_header_lib",
+-        "@org_tensorflow//third_party/xla/third_party/tsl/tsl/platform:status",
++        "@xla//xla/tsl/platform:status",
+         "@org_tensorflow//tensorflow/c:c_api_macros",
+-        "@org_tensorflow//tensorflow/c:env_hdrs",
++        "@xla//xla/tsl/platform:env",
+         "@org_tensorflow//tensorflow/c:tf_file_statistics",
+         "@org_tensorflow//tensorflow/c/experimental/filesystem:modular_filesystem",
+-        "@org_tensorflow//tensorflow/c:logging",
++        "@xla//xla/tsl/platform:logging",
+     ],
+     alwayslink = 1,
+ )
+@@ -52,6 +59,11 @@ cc_binary(
+     copts = tf_io_copts(),
+     linkshared = 1,
+     deps = [
++        "@com_google_absl//absl/log:absl_log",
++        "@com_google_absl//absl/log:log",
++        "@com_google_absl//absl/log:check",
++        "@com_google_absl//absl/log:absl_check",
++        "@com_google_absl//absl/container:btree",
+         "//tensorflow_io_gcs_filesystem/core:gs",
+     ],
+ )
+diff --git a/tensorflow_io_gcs_filesystem/core/gcs_filesystem.cc b/tensorflow_io_gcs_filesystem/core/gcs_filesystem.cc
+index 091b9979..cc0430d1 100644
+--- a/tensorflow_io_gcs_filesystem/core/gcs_filesystem.cc
++++ b/tensorflow_io_gcs_filesystem/core/gcs_filesystem.cc
+@@ -1,3 +1,6 @@
++#include <iostream>
++#include "absl/log/log.h"
++#include "absl/strings/str_format.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -20,7 +23,7 @@ limitations under the License.
+ #include "absl/strings/str_cat.h"
+ #include "absl/types/variant.h"
+ #include "google/cloud/storage/client.h"
+-#include "tensorflow/c/logging.h"
++
+ #include "tensorflow/c/tf_status.h"
+ #include "tensorflow_io_gcs_filesystem/core/expiring_lru_cache.h"
+ #include "tensorflow_io_gcs_filesystem/core/file_system_plugin_gs.h"
+@@ -245,7 +248,7 @@ static void SyncImpl(const std::string& bucket, const std::string& object,
+       TF_SetStatusFromGCSStatus(metadata.status(), status);
+       return;
+     }
+-    TF_VLog(3, "AppendObject: gs://%s/%s to gs://%s/%s", bucket.c_str(),
++    LOG(INFO) << absl::StrFormat("AppendObject: gs://%s/%s to gs://%s/%s", bucket.c_str(),
+             temporary_object.c_str(), bucket.c_str(), object.c_str());
+     const std::vector<gcs::ComposeSourceObject> source_objects = {
+         {object, {}, {}}, {temporary_object, {}, {}}};
+@@ -285,7 +288,7 @@ void Append(const TF_WritableFile* file, const char* buffer, size_t n,
+                  "The internal temporary file is not writable.");
+     return;
+   }
+-  TF_VLog(3, "Append: gs://%s/%s size %u", gcs_file->bucket.c_str(),
++  LOG(INFO) << absl::StrFormat("Append: gs://%s/%s size %u", gcs_file->bucket.c_str(),
+           gcs_file->object.c_str(), n);
+   gcs_file->sync_need = true;
+   gcs_file->outfile.write(buffer, n);
+@@ -312,7 +315,7 @@ int64_t Tell(const TF_WritableFile* file, TF_Status* status) {
+ void Flush(const TF_WritableFile* file, TF_Status* status) {
+   auto gcs_file = static_cast<GCSWritableFile*>(file->plugin_file);
+   if (gcs_file->sync_need) {
+-    TF_VLog(3, "Flush started: gs://%s/%s", gcs_file->bucket.c_str(),
++    LOG(INFO) << absl::StrFormat("Flush started: gs://%s/%s", gcs_file->bucket.c_str(),
+             gcs_file->object.c_str());
+     if (!gcs_file->outfile) {
+       TF_SetStatus(status, TF_INTERNAL,
+@@ -321,7 +324,7 @@ void Flush(const TF_WritableFile* file, TF_Status* status) {
+     }
+     SyncImpl(gcs_file->bucket, gcs_file->object, &gcs_file->offset,
+              &gcs_file->outfile, gcs_file->gcs_client, status);
+-    TF_VLog(3, "Flush finished: gs://%s/%s", gcs_file->bucket.c_str(),
++    LOG(INFO) << absl::StrFormat("Flush finished: gs://%s/%s", gcs_file->bucket.c_str(),
+             gcs_file->object.c_str());
+     if (TF_GetCode(status) != TF_OK) return;
+     gcs_file->sync_need = false;
+@@ -332,14 +335,14 @@ void Flush(const TF_WritableFile* file, TF_Status* status) {
+ 
+ void Sync(const TF_WritableFile* file, TF_Status* status) {
+   auto gcs_file = static_cast<GCSWritableFile*>(file->plugin_file);
+-  TF_VLog(3, "Sync: gs://%s/%s", gcs_file->bucket.c_str(),
++  LOG(INFO) << absl::StrFormat("Sync: gs://%s/%s", gcs_file->bucket.c_str(),
+           gcs_file->object.c_str());
+   Flush(file, status);
+ }
+ 
+ void Close(const TF_WritableFile* file, TF_Status* status) {
+   auto gcs_file = static_cast<GCSWritableFile*>(file->plugin_file);
+-  TF_VLog(3, "Close: gs://%s/%s", gcs_file->bucket.c_str(),
++  LOG(INFO) << absl::StrFormat("Close: gs://%s/%s", gcs_file->bucket.c_str(),
+           gcs_file->object.c_str());
+   if (gcs_file->sync_need) {
+     Flush(file, status);
+@@ -458,7 +461,7 @@ static int64_t LoadBufferFromGCS(
+   }
+   // `TF_OUT_OF_RANGE` isn't considered as an error. So we clear it here.
+   TF_SetStatus(status, TF_OK, "");
+-  TF_VLog(1, "Successful read of %s @ %u of size: %u", path.c_str(), offset,
++  LOG(INFO) << absl::StrFormat("Successful read of %s @ %u of size: %u", path.c_str(), offset,
+           read);
+   stream.read(buffer, read);
+   read = stream.gcount();
+@@ -472,7 +475,7 @@ static int64_t LoadBufferFromGCS(
+                                   path, " @ ", offset)
+                          .c_str());
+       }
+-      TF_VLog(2, "Successful integrity check for: %s @ %u", path.c_str(),
++      LOG(INFO) << absl::StrFormat("Successful integrity check for: %s @ %u", path.c_str(),
+               offset);
+     }
+   }
+@@ -505,7 +508,7 @@ GCSFileSystemImplementation::GCSFileSystemImplementation(
+   if (absl::SimpleAtoi(std::getenv(kMaxStaleness), &value)) {
+     max_staleness = value;
+   }
+-  TF_VLog(1, "GCS cache max size = %u ; block size = %u ; max staleness = %u",
++  LOG(INFO) << absl::StrFormat("GCS cache max size = %u ; block size = %u ; max staleness = %u",
+           max_bytes, block_size, max_staleness);
+ 
+   file_block_cache = std::make_unique<RamFileBlockCache>(
+@@ -569,8 +572,7 @@ static void UncachedStatForObject(const std::string& bucket,
+   stat->base.mtime_nsec =
+       metadata->time_storage_class_updated().time_since_epoch().count();
+   stat->base.is_directory = object.back() == '/';
+-  TF_VLog(1,
+-          "Stat of: gs://%s/%s --  length: %u generation: %u; mtime_nsec: %u;",
++  LOG(INFO) << absl::StrFormat("Stat of: gs://%s/%s --  length: %u generation: %u; mtime_nsec: %u;",
+           bucket.c_str(), object.c_str(), stat->base.length,
+           stat->generation_number, stat->base.mtime_nsec);
+   return TF_SetStatus(status, TF_OK, "");
+@@ -612,9 +614,7 @@ void NewRandomAccessFile(const TF_Filesystem* filesystem, const char* path,
+       if (TF_GetCode(status) != TF_OK) return -1;
+       if (!gcs_file->file_block_cache->ValidateAndUpdateFileSignature(
+               path, stat.generation_number)) {
+-        TF_VLog(
+-            1,
+-            "File signature has been changed. Refreshing the cache. Path: %s",
++        LOG(INFO) << absl::StrFormat("File signature has been changed. Refreshing the cache. Path: %s",
+             path.c_str());
+       }
+       read = gcs_file->file_block_cache->Read(path, offset, n, buffer, status);
+@@ -649,7 +649,7 @@ void NewWritableFile(const TF_Filesystem* filesystem, const char* path,
+       {std::move(bucket), std::move(object), &gcs_file->gcs_client,
+        TempFile(temp_file_name, std::ios::binary | std::ios::out), true,
+        (gcs_file->compose ? 0 : -1)});
+-  TF_VLog(3, "GcsWritableFile: %s", path);
++  LOG(INFO) << absl::StrFormat("GcsWritableFile: %s", path);
+   TF_SetStatus(status, TF_OK, "");
+ }
+ 
+@@ -698,7 +698,7 @@ void NewAppendableFile(const TF_Filesystem* filesystem, const char* path,
+       return;
+     }
+   }
+-  TF_VLog(3, "GcsWritableFile: %s with existing file %s", path,
++  LOG(INFO) << absl::StrFormat("GcsWritableFile: %s with existing file %s", path,
+           temp_file_name.c_str());
+   TF_SetStatus(status, TF_OK, "");
+ }
+@@ -903,8 +903,7 @@ void CreateDir(const TF_Filesystem* filesystem, const char* path,
+                TF_Status* status) {
+   std::string dir = path;
+   MaybeAppendSlash(&dir);
+-  TF_VLog(3,
+-          "CreateDir: creating directory with path: %s and "
++  LOG(INFO) << absl::StrFormat("CreateDir: creating directory with path: %s and "
+           "path_with_slash: %s",
+           path, dir.c_str());
+   std::string bucket, object;
+@@ -928,7 +927,7 @@ void CreateDir(const TF_Filesystem* filesystem, const char* path,
+   PathExists(filesystem, dir.c_str(), status);
+   if (TF_GetCode(status) == TF_OK) {
+     // Use the original name for a correct error here.
+-    TF_VLog(3, "CreateDir: directory already exists, not uploading %s", path);
++    LOG(INFO) << absl::StrFormat("CreateDir: directory already exists, not uploading %s", path);
+     return TF_SetStatus(status, TF_ALREADY_EXISTS, path);
+   }
+ 
+@@ -1054,7 +1053,7 @@ bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
+ static void RenameObject(const TF_Filesystem* filesystem,
+                          const std::string& src, const std::string& dst,
+                          TF_Status* status) {
+-  TF_VLog(3, "RenameObject: started %s to %s", src.c_str(), dst.c_str());
++  LOG(INFO) << absl::StrFormat("RenameObject: started %s to %s", src.c_str(), dst.c_str());
+   std::string bucket_src, object_src;
+   ParseGCSPath(src, false, &bucket_src, &object_src, status);
+   if (TF_GetCode(status) != TF_OK) return;
+@@ -1073,7 +1072,7 @@ static void RenameObject(const TF_Filesystem* filesystem,
+       gcs::Fields("done,rewriteToken"));
+   TF_SetStatusFromGCSStatus(metadata.status(), status);
+   if (TF_GetCode(status) != TF_OK) return;
+-  TF_VLog(3, "RenameObject: finished %s to %s", src.c_str(), dst.c_str());
++  LOG(INFO) << absl::StrFormat("RenameObject: finished %s to %s", src.c_str(), dst.c_str());
+ 
+   ClearFileCaches(gcs_file, dst);
+   DeleteFile(filesystem, src.c_str(), status);
+diff --git a/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.cc b/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.cc
+index 106df0aa..a815462f 100644
+--- a/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.cc
++++ b/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.cc
+@@ -1,3 +1,4 @@
++#include "absl/strings/str_format.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -194,7 +195,7 @@ int64_t RamFileBlockCache::Read(const std::string& filename, size_t offset,
+     // LRU iterator for the key and block.
+     std::shared_ptr<Block> block = Lookup(key);
+     if (!block) {
+-      std::cerr << "No block for key " << key.first << "@" << key.second;
++      LOG(ERROR) << "No block for key " << key.first << "@" << key.second;
+       abort();
+     }
+     MaybeFetch(key, block, status);
+diff --git a/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.h b/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.h
+index 788f1baa..cbf79f61 100644
+--- a/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.h
++++ b/tensorflow_io_gcs_filesystem/core/ram_file_block_cache.h
+@@ -1,3 +1,5 @@
++#include "absl/log/log.h"
++#include "absl/strings/str_format.h"
+ /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
+ 
+ Licensed under the Apache License, Version 2.0 (the "License");
+@@ -28,7 +30,7 @@ limitations under the License.
+ #include "absl/synchronization/mutex.h"
+ #include "absl/synchronization/notification.h"
+ #include "tensorflow/c/env.h"
+-#include "tensorflow/c/logging.h"
++
+ #include "tensorflow/c/tf_status.h"
+ 
+ namespace tensorflow {
+@@ -70,7 +72,7 @@ class RamFileBlockCache {
+       pruning_thread_.reset(
+           TF_StartThread(&thread_options, "TF_prune_FBC", PruneThread, this));
+     }
+-    TF_VLog(1, "GCS file block cache is %s.\n",
++    LOG(INFO) << absl::StrFormat("GCS file block cache is %s.\n",
+             (IsCacheEnabled() ? "enabled" : "disabled"));
+   }
+ 
+diff --git a/third_party/BUILD b/third_party/BUILD
+index 7b8d4c58..e9a50fba 100644
+--- a/third_party/BUILD
++++ b/third_party/BUILD
+@@ -28,3 +28,9 @@ cc_library(
+     visibility = ["//visibility:public"],
+     deps = [],
+ )
++
++cc_library(
++    name = "tirpc",
++    hdrs = glob(["tirpc/**/*.h"]),
++    visibility = ["//visibility:public"],
++)
+diff --git a/third_party/boost.BUILD b/third_party/boost.BUILD
+index 6ca1255e..2c28707e 100644
+--- a/third_party/boost.BUILD
++++ b/third_party/boost.BUILD
+@@ -35,7 +35,7 @@ cc_library(
+     ],
+     deps = [
+         "@bzip2",
+-        "@xz//:lzma",
++        "@custom_xz//:lzma",
+         "@zlib",
+         "@zstd",
+     ],
+diff --git a/third_party/htslib.BUILD b/third_party/htslib.BUILD
+index 2f1e429c..1b029dc3 100644
+--- a/third_party/htslib.BUILD
++++ b/third_party/htslib.BUILD
+@@ -137,7 +137,7 @@ cc_library(
+     visibility = ["//visibility:public"],
+     deps = [
+         "@bzip2",
+-        "@xz//:lzma",
++        "@custom_xz//:lzma",
+         "@zlib",
+     ],
+ )
+diff --git a/third_party/kafka.BUILD b/third_party/kafka.BUILD
+index 5ebe3851..36e5395f 100644
+--- a/third_party/kafka.BUILD
++++ b/third_party/kafka.BUILD
+@@ -35,7 +35,6 @@ cc_library(
+         ],
+     ) + [
+         "config/config.h",
+-        "config/src/set1_host.c",
+         "config/src/win32_config.h",
+     ] + select({
+         "@bazel_tools//src/conditions:windows": [
+@@ -45,7 +44,6 @@ cc_library(
+     }),
+     hdrs = [
+         "config/config.h",
+-        "config/src/set1_host.c",
+         "config/src/win32_config.h",
+         "src/rdxxhash.c",
+         "src/rdxxhash.h",
+@@ -76,19 +74,6 @@ cc_library(
+     ],
+ )
+ 
+-genrule(
+-    name = "set1_host_c",
+-    outs = ["config/src/set1_host.c"],
+-    cmd = "\n".join([
+-        "cat <<'EOF' >$@",
+-        "#include <openssl/ssl.h>",
+-        "int SSL_set1_host(SSL *s, const char *hostname) {",
+-        "  return X509_VERIFY_PARAM_set1_host(SSL_get0_param(s), hostname, 0);",
+-        "}",
+-        "EOF",
+-    ]),
+-)
+-
+ genrule(
+     name = "win32_config_h",
+     outs = ["config/src/win32_config.h"],
+diff --git a/third_party/libtiff.BUILD b/third_party/libtiff.BUILD
+index 6054b994..01a52284 100644
+--- a/third_party/libtiff.BUILD
++++ b/third_party/libtiff.BUILD
+@@ -34,8 +34,8 @@ cc_library(
+     visibility = ["//visibility:public"],
+     deps = [
+         "@libjpeg_turbo//:jpeg",
+-        "@libwebp",
+-        "@xz//:lzma",
++        "@custom_libwebp//:libwebp",
++        "@custom_xz//:lzma",
+         "@zlib",
+         "@zstd",
+     ],
+diff --git a/third_party/libxml.BUILD b/third_party/libxml.BUILD
+index 596931d1..4c682881 100644
+--- a/third_party/libxml.BUILD
++++ b/third_party/libxml.BUILD
+@@ -76,7 +76,7 @@ cc_library(
+     textual_hdrs = ["trionan.c"],
+     visibility = ["//visibility:public"],
+     deps = [
+-        "@xz//:lzma",
++        "@custom_xz//:lzma",
+         "@zlib",
+     ],
+ )
+diff --git a/third_party/snappy.BUILD b/third_party/snappy.BUILD
+index 9559b8e9..9ff9a013 100644
+--- a/third_party/snappy.BUILD
++++ b/third_party/snappy.BUILD
+@@ -19,7 +19,7 @@ cc_library(
+     ],
+     hdrs = ["snappy.h"],
+     copts = ["-DHAVE_CONFIG_H"] + select({
+-        "@local_xla//xla/tsl:windows": [],
++        "@xla//xla/tsl:windows": [],
+         "//conditions:default": [
+             "-fno-exceptions",
+             "-Wno-sign-compare",
+@@ -28,7 +28,7 @@ cc_library(
+         ],
+     }),
+     defines = select({
+-        "@local_xla//xla/tsl:windows": [],
++        "@xla//xla/tsl:windows": [],
+         "//conditions:default": ["HAVE_SYS_UIO_H"],
+     }),
+ )

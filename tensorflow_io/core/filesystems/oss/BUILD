@@ -19,6 +19,11 @@ cc_library(
         "//tensorflow_io/core/filesystems:filesystem_plugins_header",
         "@aliyun_oss_c_sdk",
         "@local_config_tf//:tf_header_lib",
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
     ],
     alwayslink = 1,
 )

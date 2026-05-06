@@ -1,3 +1,6 @@
+#include <iostream>
+#include "absl/log/log.h"
+#include "absl/strings/str_format.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +23,7 @@ limitations under the License.
 #include "absl/strings/str_cat.h"
 #include "absl/types/variant.h"
 #include "google/cloud/storage/client.h"
-#include "tensorflow/c/logging.h"
+
 #include "tensorflow/c/tf_status.h"
 #include "tensorflow_io_gcs_filesystem/core/expiring_lru_cache.h"
 #include "tensorflow_io_gcs_filesystem/core/file_system_plugin_gs.h"
@@ -245,7 +248,7 @@ static void SyncImpl(const std::string& bucket, const std::string& object,
       TF_SetStatusFromGCSStatus(metadata.status(), status);
       return;
     }
-    TF_VLog(3, "AppendObject: gs://%s/%s to gs://%s/%s", bucket.c_str(),
+    LOG(INFO) << absl::StrFormat("AppendObject: gs://%s/%s to gs://%s/%s", bucket.c_str(),
             temporary_object.c_str(), bucket.c_str(), object.c_str());
     const std::vector<gcs::ComposeSourceObject> source_objects = {
         {object, {}, {}}, {temporary_object, {}, {}}};
@@ -285,7 +288,7 @@ void Append(const TF_WritableFile* file, const char* buffer, size_t n,
                  "The internal temporary file is not writable.");
     return;
   }
-  TF_VLog(3, "Append: gs://%s/%s size %u", gcs_file->bucket.c_str(),
+  LOG(INFO) << absl::StrFormat("Append: gs://%s/%s size %u", gcs_file->bucket.c_str(),
           gcs_file->object.c_str(), n);
   gcs_file->sync_need = true;
   gcs_file->outfile.write(buffer, n);
@@ -312,7 +315,7 @@ int64_t Tell(const TF_WritableFile* file, TF_Status* status) {
 void Flush(const TF_WritableFile* file, TF_Status* status) {
   auto gcs_file = static_cast<GCSWritableFile*>(file->plugin_file);
   if (gcs_file->sync_need) {
-    TF_VLog(3, "Flush started: gs://%s/%s", gcs_file->bucket.c_str(),
+    LOG(INFO) << absl::StrFormat("Flush started: gs://%s/%s", gcs_file->bucket.c_str(),
             gcs_file->object.c_str());
     if (!gcs_file->outfile) {
       TF_SetStatus(status, TF_INTERNAL,
@@ -321,7 +324,7 @@ void Flush(const TF_WritableFile* file, TF_Status* status) {
     }
     SyncImpl(gcs_file->bucket, gcs_file->object, &gcs_file->offset,
              &gcs_file->outfile, gcs_file->gcs_client, status);
-    TF_VLog(3, "Flush finished: gs://%s/%s", gcs_file->bucket.c_str(),
+    LOG(INFO) << absl::StrFormat("Flush finished: gs://%s/%s", gcs_file->bucket.c_str(),
             gcs_file->object.c_str());
     if (TF_GetCode(status) != TF_OK) return;
     gcs_file->sync_need = false;
@@ -332,14 +335,14 @@ void Flush(const TF_WritableFile* file, TF_Status* status) {
 
 void Sync(const TF_WritableFile* file, TF_Status* status) {
   auto gcs_file = static_cast<GCSWritableFile*>(file->plugin_file);
-  TF_VLog(3, "Sync: gs://%s/%s", gcs_file->bucket.c_str(),
+  LOG(INFO) << absl::StrFormat("Sync: gs://%s/%s", gcs_file->bucket.c_str(),
           gcs_file->object.c_str());
   Flush(file, status);
 }
 
 void Close(const TF_WritableFile* file, TF_Status* status) {
   auto gcs_file = static_cast<GCSWritableFile*>(file->plugin_file);
-  TF_VLog(3, "Close: gs://%s/%s", gcs_file->bucket.c_str(),
+  LOG(INFO) << absl::StrFormat("Close: gs://%s/%s", gcs_file->bucket.c_str(),
           gcs_file->object.c_str());
   if (gcs_file->sync_need) {
     Flush(file, status);
@@ -458,7 +461,7 @@ static int64_t LoadBufferFromGCS(
   }
   // `TF_OUT_OF_RANGE` isn't considered as an error. So we clear it here.
   TF_SetStatus(status, TF_OK, "");
-  TF_VLog(1, "Successful read of %s @ %u of size: %u", path.c_str(), offset,
+  LOG(INFO) << absl::StrFormat("Successful read of %s @ %u of size: %u", path.c_str(), offset,
           read);
   stream.read(buffer, read);
   read = stream.gcount();
@@ -472,7 +475,7 @@ static int64_t LoadBufferFromGCS(
                                   path, " @ ", offset)
                          .c_str());
       }
-      TF_VLog(2, "Successful integrity check for: %s @ %u", path.c_str(),
+      LOG(INFO) << absl::StrFormat("Successful integrity check for: %s @ %u", path.c_str(),
               offset);
     }
   }
@@ -505,7 +508,7 @@ GCSFileSystemImplementation::GCSFileSystemImplementation(
   if (absl::SimpleAtoi(std::getenv(kMaxStaleness), &value)) {
     max_staleness = value;
   }
-  TF_VLog(1, "GCS cache max size = %u ; block size = %u ; max staleness = %u",
+  LOG(INFO) << absl::StrFormat("GCS cache max size = %u ; block size = %u ; max staleness = %u",
           max_bytes, block_size, max_staleness);
 
   file_block_cache = std::make_unique<RamFileBlockCache>(
@@ -569,8 +572,7 @@ static void UncachedStatForObject(const std::string& bucket,
   stat->base.mtime_nsec =
       metadata->time_storage_class_updated().time_since_epoch().count();
   stat->base.is_directory = object.back() == '/';
-  TF_VLog(1,
-          "Stat of: gs://%s/%s --  length: %u generation: %u; mtime_nsec: %u;",
+  LOG(INFO) << absl::StrFormat("Stat of: gs://%s/%s --  length: %u generation: %u; mtime_nsec: %u;",
           bucket.c_str(), object.c_str(), stat->base.length,
           stat->generation_number, stat->base.mtime_nsec);
   return TF_SetStatus(status, TF_OK, "");
@@ -612,9 +614,7 @@ void NewRandomAccessFile(const TF_Filesystem* filesystem, const char* path,
       if (TF_GetCode(status) != TF_OK) return -1;
       if (!gcs_file->file_block_cache->ValidateAndUpdateFileSignature(
               path, stat.generation_number)) {
-        TF_VLog(
-            1,
-            "File signature has been changed. Refreshing the cache. Path: %s",
+        LOG(INFO) << absl::StrFormat("File signature has been changed. Refreshing the cache. Path: %s",
             path.c_str());
       }
       read = gcs_file->file_block_cache->Read(path, offset, n, buffer, status);
@@ -649,7 +649,7 @@ void NewWritableFile(const TF_Filesystem* filesystem, const char* path,
       {std::move(bucket), std::move(object), &gcs_file->gcs_client,
        TempFile(temp_file_name, std::ios::binary | std::ios::out), true,
        (gcs_file->compose ? 0 : -1)});
-  TF_VLog(3, "GcsWritableFile: %s", path);
+  LOG(INFO) << absl::StrFormat("GcsWritableFile: %s", path);
   TF_SetStatus(status, TF_OK, "");
 }
 
@@ -698,7 +698,7 @@ void NewAppendableFile(const TF_Filesystem* filesystem, const char* path,
       return;
     }
   }
-  TF_VLog(3, "GcsWritableFile: %s with existing file %s", path,
+  LOG(INFO) << absl::StrFormat("GcsWritableFile: %s with existing file %s", path,
           temp_file_name.c_str());
   TF_SetStatus(status, TF_OK, "");
 }
@@ -903,8 +903,7 @@ void CreateDir(const TF_Filesystem* filesystem, const char* path,
                TF_Status* status) {
   std::string dir = path;
   MaybeAppendSlash(&dir);
-  TF_VLog(3,
-          "CreateDir: creating directory with path: %s and "
+  LOG(INFO) << absl::StrFormat("CreateDir: creating directory with path: %s and "
           "path_with_slash: %s",
           path, dir.c_str());
   std::string bucket, object;
@@ -928,7 +927,7 @@ void CreateDir(const TF_Filesystem* filesystem, const char* path,
   PathExists(filesystem, dir.c_str(), status);
   if (TF_GetCode(status) == TF_OK) {
     // Use the original name for a correct error here.
-    TF_VLog(3, "CreateDir: directory already exists, not uploading %s", path);
+    LOG(INFO) << absl::StrFormat("CreateDir: directory already exists, not uploading %s", path);
     return TF_SetStatus(status, TF_ALREADY_EXISTS, path);
   }
 
@@ -1054,7 +1053,7 @@ bool IsDirectory(const TF_Filesystem* filesystem, const char* path,
 static void RenameObject(const TF_Filesystem* filesystem,
                          const std::string& src, const std::string& dst,
                          TF_Status* status) {
-  TF_VLog(3, "RenameObject: started %s to %s", src.c_str(), dst.c_str());
+  LOG(INFO) << absl::StrFormat("RenameObject: started %s to %s", src.c_str(), dst.c_str());
   std::string bucket_src, object_src;
   ParseGCSPath(src, false, &bucket_src, &object_src, status);
   if (TF_GetCode(status) != TF_OK) return;
@@ -1073,7 +1072,7 @@ static void RenameObject(const TF_Filesystem* filesystem,
       gcs::Fields("done,rewriteToken"));
   TF_SetStatusFromGCSStatus(metadata.status(), status);
   if (TF_GetCode(status) != TF_OK) return;
-  TF_VLog(3, "RenameObject: finished %s to %s", src.c_str(), dst.c_str());
+  LOG(INFO) << absl::StrFormat("RenameObject: finished %s to %s", src.c_str(), dst.c_str());
 
   ClearFileCaches(gcs_file, dst);
   DeleteFile(filesystem, src.c_str(), status);

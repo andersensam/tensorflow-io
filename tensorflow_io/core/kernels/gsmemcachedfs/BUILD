@@ -14,6 +14,11 @@ cc_library(
     linkstatic = True,
     visibility = ["//visibility:public"],
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         "@libmemcached",
     ],
 )
@@ -26,6 +31,11 @@ cc_library(
     linkstatic = True,
     visibility = ["//visibility:public"],
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         ":memcached_dao_interfaces",
         "@com_google_absl//absl/container:flat_hash_map",
         "@farmhash_archive//:farmhash",
@@ -46,6 +56,11 @@ cc_library(
     linkstatic = True,
     visibility = ["//visibility:public"],
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         "@com_google_absl//absl/memory",
         "@local_config_tf//:libtensorflow_framework",
         "@local_config_tf//:tf_header_lib",
@@ -60,6 +75,11 @@ cc_library(
     linkstatic = True,
     visibility = ["//visibility:public"],
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         ":gce_memcached_server_list_provider",
         ":memcached_file_block_cache",
         "@com_google_absl//absl/memory",
@@ -76,6 +96,11 @@ cc_library(
     linkstatic = 1,  # Needed since alwayslink is broken in bazel b/27630669
     visibility = ["//visibility:public"],
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         ":gce_memcached_server_list_provider",
         ":memcached_file_system",
         "@com_google_absl//absl/memory",

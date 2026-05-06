@@ -1,3 +1,4 @@
+#include "absl/log/log.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 #include "tensorflow_io/core/filesystems/s3/aws_logging.h"
+#include "absl/strings/str_format.h"
 
 #include <aws/core/Aws.h>
 #include <aws/core/utils/logging/AWSLogging.h>
@@ -23,7 +25,7 @@ limitations under the License.
 #include <sstream>
 
 #include "absl/synchronization/mutex.h"
-#include "tensorflow/c/logging.h"
+
 
 namespace tensorflow {
 namespace io {
@@ -56,20 +58,20 @@ void AWSLogSystem::LogMessage(Aws::Utils::Logging::LogLevel log_level,
   if (message == "Initializing Curl library") return;
   switch (log_level) {
     case Aws::Utils::Logging::LogLevel::Info:
-      TF_Log(TF_INFO, message.c_str());
+      LOG(INFO) << message;
       break;
     case Aws::Utils::Logging::LogLevel::Warn:
-      TF_Log(TF_WARNING, message.c_str());
+      LOG(ERROR) << message;
       break;
     case Aws::Utils::Logging::LogLevel::Error:
-      TF_Log(TF_ERROR, message.c_str());
+      LOG(ERROR) << message;
       break;
     case Aws::Utils::Logging::LogLevel::Fatal:
-      TF_Log(TF_FATAL, message.c_str());
+      LOG(ERROR) << message;
       break;
     default:
       // this will match for DEBUG, TRACE
-      TF_Log(TF_INFO, message.c_str());
+      LOG(INFO) << message;
       break;
   }
 }

@@ -1,3 +1,5 @@
+#include "absl/log/log.h"
+#include "absl/strings/str_format.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +33,7 @@ limitations under the License.
 #include "absl/strings/str_cat.h"
 #include "absl/synchronization/mutex.h"
 #include "hdfs/hdfs.h"
-#include "tensorflow/c/logging.h"
+
 #include "tensorflow/c/tf_status.h"
 #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
 
@@ -241,7 +243,7 @@ class LibHDFS {
       if (TF_GetCode(status) == TF_OK) {
         return;
       } else {
-        TF_Log(TF_ERROR, "HadoopFileSystem load error: %s", TF_Message(status));
+        LOG(ERROR) << "HadoopFileSystem load error: " << TF_Message(status);
       }
     }
 

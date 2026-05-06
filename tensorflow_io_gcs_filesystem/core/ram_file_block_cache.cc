@@ -1,3 +1,4 @@
+#include "absl/strings/str_format.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -194,7 +195,7 @@ int64_t RamFileBlockCache::Read(const std::string& filename, size_t offset,
     // LRU iterator for the key and block.
     std::shared_ptr<Block> block = Lookup(key);
     if (!block) {
-      std::cerr << "No block for key " << key.first << "@" << key.second;
+      LOG(ERROR) << "No block for key " << key.first << "@" << key.second;
       abort();
     }
     MaybeFetch(key, block, status);

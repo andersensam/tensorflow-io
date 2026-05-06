@@ -1,3 +1,4 @@
+#include "absl/strings/str_format.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -164,7 +165,7 @@ class FlacStreamDecoder {
   static void ErrorCallback(const FLAC__StreamDecoder* decoder,
                             FLAC__StreamDecoderErrorStatus status,
                             void* client_data) {
-    std::cerr << "ErrorCallback: " << std::endl;
+    LOG(ERROR) << "ErrorCallback: ";
   }
 
   SizedRandomAccessFile* file;

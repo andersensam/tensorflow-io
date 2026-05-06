@@ -1,3 +1,7 @@
+#include <iostream>
+#include "absl/log/log.h"
+#include "absl/strings/str_format.h"
+#include "absl/log/log.h"
 /* Copyright 2020 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +40,7 @@ limitations under the License.
 #include "absl/strings/ascii.h"
 #include "absl/strings/numbers.h"
 #include "absl/strings/str_cat.h"
-#include "tensorflow/c/logging.h"
+
 #include "tensorflow/c/tf_status.h"
 #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
 #include "tensorflow_io/core/filesystems/s3/aws_logging.h"
@@ -288,7 +292,7 @@ void Cleanup(TF_RandomAccessFile* file) {
 
 static int64_t ReadS3Client(S3File* s3_file, uint64_t offset, size_t n,
                             char* buffer, TF_Status* status) {
-  TF_VLog(3, "ReadFile using S3Client\n");
+  LOG(INFO) << absl::StrFormat("ReadFile using S3Client\n");
   Aws::S3::Model::GetObjectRequest get_object_request;
   get_object_request.WithBucket(s3_file->bucket).WithKey(s3_file->object);
   Aws::String bytes =
@@ -314,13 +318,13 @@ static int64_t ReadS3Client(S3File* s3_file, uint64_t offset, size_t n,
 
 static int64_t ReadS3TransferManager(S3File* s3_file, uint64_t offset, size_t n,
                                      char* buffer, TF_Status* status) {
-  TF_VLog(3, "Using TransferManager\n");
+  LOG(INFO) << absl::StrFormat("Using TransferManager\n");
   auto stream_buf = Aws::MakeShared<Aws::Utils::Stream::PreallocatedStreamBuf>(
       "S3StreamBuf", reinterpret_cast<unsigned char*>(buffer), n);
   auto create_download_stream = [stream_buf]() {
     return Aws::New<TFS3UnderlyingStream>("S3ReadStream", stream_buf.get());
   };
-  TF_VLog(3, "Created stream to read with transferManager\n");
+  LOG(INFO) << absl::StrFormat("Created stream to read with transferManager\n");
   auto handle = s3_file->transfer_manager->DownloadFile(
       s3_file->bucket, s3_file->object, offset, n, create_download_stream);
   handle->WaitUntilFinished();
@@ -331,9 +335,7 @@ static int64_t ReadS3TransferManager(S3File* s3_file, uint64_t offset, size_t n,
              Aws::Http::HttpResponseCode::REQUESTED_RANGE_NOT_SATISFIABLE &&
          retries++ < kDownloadRetries) {
     // Only failed parts will be downloaded again.
-    TF_VLog(
-        1,
-        "Retrying read of s3://%s/%s after failure. Current retry count: %u\n",
+    LOG(INFO) << absl::StrFormat("Retrying read of s3://%s/%s after failure. Current retry count: %u\n",
         s3_file->bucket.c_str(), s3_file->object.c_str(), retries);
     s3_file->transfer_manager->RetryDownload(handle);
     handle->WaitUntilFinished();
@@ -354,7 +356,7 @@ static int64_t ReadS3TransferManager(S3File* s3_file, uint64_t offset, size_t n,
 int64_t Read(const TF_RandomAccessFile* file, uint64_t offset, size_t n,
              char* buffer, TF_Status* status) {
   auto s3_file = static_cast<S3File*>(file->plugin_file);
-  TF_VLog(1, "ReadFilefromS3 s3://%s/%s from %u for n: %u\n",
+  LOG(INFO) << absl::StrFormat("ReadFilefromS3 s3://%s/%s from %u for n: %u\n",
           s3_file->bucket.c_str(), s3_file->object.c_str(), offset, n);
   if (s3_file->use_multi_part_download)
     return ReadS3TransferManager(s3_file, offset, n, buffer, status);
@@ -440,7 +442,7 @@ void Sync(const TF_WritableFile* file, TF_Status* status) {
     TF_SetStatus(status, TF_OK, "");
     return;
   }
-  TF_VLog(1, "WriteFileToS3: s3://%s/%s\n", s3_file->bucket.c_str(),
+  LOG(INFO) << absl::StrFormat("WriteFileToS3: s3://%s/%s\n", s3_file->bucket.c_str(),
           s3_file->object.c_str());
   auto position = static_cast<int64_t>(s3_file->outfile->tellp());
   // We always re-upload the whole file.
@@ -454,8 +456,7 @@ void Sync(const TF_WritableFile* file, TF_Status* status) {
   while (handle->GetStatus() == Aws::Transfer::TransferStatus::FAILED &&
          retries++ < kUploadRetries) {
     // if multipart upload was used, only the failed parts will be re-sent
-    TF_VLog(1,
-            "Retrying upload of s3://%s/%s after failure. Current retry count: "
+    LOG(INFO) << absl::StrFormat("Retrying upload of s3://%s/%s after failure. Current retry count: "
             "%u\n",
             s3_file->bucket.c_str(), s3_file->object.c_str(), retries);
     s3_file->transfer_manager->RetryUpload(s3_file->outfile, handle);
@@ -628,7 +629,7 @@ void NewAppendableFile(const TF_Filesystem* filesystem, const char* path,
 
 void Stat(const TF_Filesystem* filesystem, const char* path,
           TF_FileStatistics* stats, TF_Status* status) {
-  TF_VLog(1, "Stat on path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("Stat on path: %s\n", path);
   Aws::String bucket, object;
   ParseS3Path(path, true, &bucket, &object, status);
   if (TF_GetCode(status) != TF_OK) return;
@@ -753,7 +754,7 @@ static void SimpleCopyFile(const Aws::String& source,
                            const Aws::String& bucket_dst,
                            const Aws::String& object_dst, S3File* s3_file,
                            TF_Status* status) {
-  TF_VLog(1, "SimpleCopyFile from %s to %s/%s\n", source.c_str(),
+  LOG(INFO) << absl::StrFormat("SimpleCopyFile from %s to %s/%s\n", source.c_str(),
           bucket_dst.c_str(), object_dst.c_str());
   Aws::S3::Model::CopyObjectRequest copy_object_request;
   copy_object_request.WithCopySource(source)
@@ -819,7 +820,7 @@ static void MultiPartCopy(const Aws::String& source,
                           const Aws::String& object_dst, const size_t num_parts,
                           const uint64_t file_size, S3File* s3_file,
                           TF_Status* status) {
-  TF_VLog(1, "MultiPartCopy from %s to %s/%s\n", source.c_str(),
+  LOG(INFO) << absl::StrFormat("MultiPartCopy from %s to %s/%s\n", source.c_str(),
           bucket_dst.c_str(), object_dst.c_str());
   Aws::S3::Model::CreateMultipartUploadRequest create_multipart_upload_request;
   create_multipart_upload_request.WithBucket(bucket_dst).WithKey(object_dst);
@@ -846,7 +847,7 @@ static void MultiPartCopy(const Aws::String& source,
   auto chunk_size =
       s3_file->multi_part_chunk_sizes[Aws::Transfer::TransferDirection::UPLOAD];
 
-  TF_VLog(1, "Copying from %s in %u parts of size %u each\n", source.c_str(),
+  LOG(INFO) << absl::StrFormat("Copying from %s in %u parts of size %u each\n", source.c_str(),
           num_parts, chunk_size);
   size_t retries = 0;
   while (retries++ < 3) {
@@ -912,9 +913,7 @@ static void MultiPartCopy(const Aws::String& source,
                                           status);
         } else {
           // Retry.
-          TF_Log(TF_ERROR,
-                 "Retrying failed copy of part %u due to an error with S3\n",
-                 part_number);
+          LOG(ERROR) << absl::StrFormat("Retrying failed copy of part %d due to an error with S3", part_number);
           num_finished_parts--;
         }
       }
@@ -992,7 +991,7 @@ void CopyFile(const TF_Filesystem* filesystem, const char* src, const char* dst,
 
 void DeleteFile(const TF_Filesystem* filesystem, const char* path,
                 TF_Status* status) {
-  TF_VLog(1, "DeleteFile: %s\n", path);
+  LOG(INFO) << absl::StrFormat("DeleteFile: %s\n", path);
   Aws::String bucket, object;
   ParseS3Path(path, false, &bucket, &object, status);
   if (TF_GetCode(status) != TF_OK) return;
@@ -1011,7 +1010,7 @@ void DeleteFile(const TF_Filesystem* filesystem, const char* path,
 
 void CreateDir(const TF_Filesystem* filesystem, const char* path,
                TF_Status* status) {
-  TF_VLog(1, "CreateDir: %s\n", path);
+  LOG(INFO) << absl::StrFormat("CreateDir: %s\n", path);
   Aws::String bucket, object;
   ParseS3Path(path, true, &bucket, &object, status);
   if (TF_GetCode(status) != TF_OK) return;
@@ -1058,7 +1057,7 @@ void RecursivelyCreateDir(const TF_Filesystem* filesystem, const char* path,
 
 void DeleteDir(const TF_Filesystem* filesystem, const char* path,
                TF_Status* status) {
-  TF_VLog(1, "DeleteDir: %s\n", path);
+  LOG(INFO) << absl::StrFormat("DeleteDir: %s\n", path);
   Aws::String bucket, object;
   ParseS3Path(path, false, &bucket, &object, status);
   if (TF_GetCode(status) != TF_OK) return;
@@ -1093,7 +1092,7 @@ void DeleteDir(const TF_Filesystem* filesystem, const char* path,
 
 void RenameFile(const TF_Filesystem* filesystem, const char* src,
                 const char* dst, TF_Status* status) {
-  TF_VLog(1, "RenameFile from: %s to %s\n", src, dst);
+  LOG(INFO) << absl::StrFormat("RenameFile from: %s to %s\n", src, dst);
   Aws::String bucket_src, object_src;
   ParseS3Path(src, false, &bucket_src, &object_src, status);
   if (TF_GetCode(status) != TF_OK) return;
@@ -1155,7 +1154,7 @@ void RenameFile(const TF_Filesystem* filesystem, const char* src,
 
 int GetChildren(const TF_Filesystem* filesystem, const char* path,
                 char*** entries, TF_Status* status) {
-  TF_VLog(1, "GetChildren for path: %s\n", path);
+  LOG(INFO) << absl::StrFormat("GetChildren for path: %s\n", path);
   Aws::String bucket, prefix;
   ParseS3Path(path, true, &bucket, &prefix, status);
   if (TF_GetCode(status) != TF_OK) return -1;

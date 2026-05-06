@@ -28,3 +28,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [],
 )
+
+cc_library(
+    name = "tirpc",
+    hdrs = glob(["tirpc/**/*.h"]),
+    visibility = ["//visibility:public"],
+)

@@ -1,3 +1,5 @@
+#include "absl/log/log.h"
+#include "absl/strings/str_format.h"
 /* Copyright 2019 The TensorFlow Authors. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +24,7 @@ limitations under the License.
 #include "absl/strings/ascii.h"
 #include "absl/strings/str_cat.h"
 #include "absl/synchronization/mutex.h"
-#include "tensorflow/c/logging.h"
+
 #include "tensorflow/c/tf_status.h"
 #include "tensorflow_io/core/filesystems/filesystem_plugins.h"
 
@@ -489,7 +491,7 @@ class CurlHttpRequest {
           curl_easy_strerror(pretransfer_time_status),
           "), start-transfer time: ", starttransfer_time, " (",
           curl_easy_strerror(starttransfer_time_status), ")");
-      TF_Log(TF_ERROR, error_message.c_str());
+      LOG(ERROR) << error_message;
       return 1;  // Will abort the request.
     }
     // No progress was made since the last call, but we should wait a bit

@@ -22,6 +22,11 @@ cc_library(
     copts = tf_io_copts(),
     linkstatic = True,
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         "@local_config_tf//:tf_c_header_lib",
         "@local_config_tf//:tf_tsl_header_lib",
     ],
@@ -36,6 +41,11 @@ cc_library(
     copts = tf_io_copts(),
     linkstatic = True,
     deps = [
+        "@com_google_absl//absl/log:absl_log",
+        "@com_google_absl//absl/log:log",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/log:absl_check",
+        "@com_google_absl//absl/container:btree",
         "//tensorflow_io/core/filesystems/az",
         "//tensorflow_io/core/filesystems/hdfs",
         "//tensorflow_io/core/filesystems/http",

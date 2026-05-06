@@ -76,7 +76,7 @@ cc_library(
     textual_hdrs = ["trionan.c"],
     visibility = ["//visibility:public"],
     deps = [
-        "@xz//:lzma",
+        "@custom_xz//:lzma",
         "@zlib",
     ],
 )

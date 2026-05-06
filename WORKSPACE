@@ -42,11 +42,10 @@ http_archive(
     patch_cmds = [
         """sed -i.bak 's/bio.c",/bio.c","src\\/decrepit\\/bio\\/base64_bio.c",/g' BUILD.generated.bzl""",
     ],
-    sha256 = "a9c3b03657d507975a32732f04563132b4553c20747cec6dc04de475c8bdf29f",
-    strip_prefix = "boringssl-80ca9f9f6ece29ab132cce4cf807a9465a18cfac",
+    sha256 = "9dc53f851107eaf87b391136d13b815df97ec8f76dadb487b58b2fc45e624d2c",
+    strip_prefix = "boringssl-c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc",
     urls = [
-        "https://storage.googleapis.com/mirror.tensorflow.org/github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
-        "https://github.com/google/boringssl/archive/80ca9f9f6ece29ab132cce4cf807a9465a18cfac.tar.gz",
+        "https://github.com/google/boringssl/archive/c00d7ca810e93780bd0c8ee4eea28f4f2ea4bcdc.tar.gz",
     ],
 )
 
@@ -103,15 +102,35 @@ switched_rules_by_language(
 # Use git_repository to avoid having to update SHA256 each time a new commit is made
 git_repository(
     name = "org_tensorflow",
-    branch = "r2.19",
-    remote = "https://github.com/andersensam/tensorflow.git"
+    branch = "r2.21",
+    remote = "https://github.com/andersensam/tensorflow.git",
 )
 
-load("@org_tensorflow//third_party/xla/third_party/py:python_init_rules.bzl", "python_init_rules")
+http_archive(
+    name = "rules_ml_toolchain",
+    sha256 = "e437448557fb0528a9a3b3dc9399465426eeaaae7101360983d6c1a56b7846ea",
+    strip_prefix = "rules_ml_toolchain-5859ea7c33f8c608e4d231e1f49417262867320a",
+    urls = ["https://github.com/andersensam/rules_ml_toolchain/archive/5859ea7c33f8c608e4d231e1f49417262867320a.tar.gz"],
+)
+
+load(
+    "@rules_ml_toolchain//cc/deps:cc_toolchain_deps.bzl",
+    "cc_toolchain_deps",
+)
+
+cc_toolchain_deps()
+
+register_toolchains("@rules_ml_toolchain//cc:linux_x86_64_linux_x86_64")
+register_toolchains("@rules_ml_toolchain//cc:linux_x86_64_linux_x86_64_cuda")
+
+load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
+tf_workspace3()
+
+load("@xla//third_party/py:python_init_rules.bzl", "python_init_rules")
 
 python_init_rules()
 
-load("@org_tensorflow//third_party/xla/third_party/py:python_init_repositories.bzl", "python_init_repositories")
+load("@xla//third_party/py:python_init_repositories.bzl", "python_init_repositories")
 
 python_init_repositories(
     default_python_version = "system",
@@ -129,11 +148,11 @@ python_init_repositories(
     },
 )
 
-load("@org_tensorflow//third_party/xla/third_party/py:python_init_toolchains.bzl", "python_init_toolchains")
+load("@xla//third_party/py:python_init_toolchains.bzl", "python_init_toolchains")
 
 python_init_toolchains()
 
-load("@org_tensorflow//third_party/xla/third_party/py:python_init_pip.bzl", "python_init_pip")
+load("@xla//third_party/py:python_init_pip.bzl", "python_init_pip")
 
 python_init_pip()
 
@@ -141,17 +160,16 @@ load("@pypi//:requirements.bzl", "install_deps")
 
 install_deps()
 
-http_archive(
-    name = "tsl",
-    build_file = "//third_party:tsl.BUILD",
-    sha256 = "370a84bd1c50fe7e36c46812f64d7697ed30fc3e78a5280e0ebf0611a88b4d3e",
-    strip_prefix = "tsl-main",
-    url = "https://github.com/andersensam/tsl/archive/refs/heads/main.zip",
+load(
+    "@xla//third_party/py:python_wheel.bzl",
+    "python_wheel_version_suffix_repository",
 )
 
-load("@org_tensorflow//tensorflow:workspace3.bzl", "tf_workspace3")
+python_wheel_version_suffix_repository(name = "tf_wheel_version_suffix")
 
-tf_workspace3()
+
+
+
 
 load("@org_tensorflow//tensorflow:workspace2.bzl", "tf_workspace2")
 
@@ -166,7 +184,7 @@ load("@org_tensorflow//tensorflow:workspace0.bzl", "tf_workspace0")
 tf_workspace0()
 
 load(
-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_json_init_repository.bzl",
+    "@xla//third_party/gpus/cuda/hermetic:cuda_json_init_repository.bzl",
     "cuda_json_init_repository",
 )
 
@@ -178,7 +196,7 @@ load(
     "CUDNN_REDISTRIBUTIONS",
 )
 load(
-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_redist_init_repositories.bzl",
+    "@xla//third_party/gpus/cuda/hermetic:cuda_redist_init_repositories.bzl",
     "cuda_redist_init_repositories",
     "cudnn_redist_init_repository",
 )
@@ -192,21 +210,21 @@ cudnn_redist_init_repository(
 )
 
 load(
-    "@org_tensorflow//third_party/gpus/cuda/hermetic:cuda_configure.bzl",
+    "@xla//third_party/gpus/cuda/hermetic:cuda_configure.bzl",
     "cuda_configure",
 )
 
 cuda_configure(name = "local_config_cuda")
 
 load(
-    "@org_tensorflow//third_party/nccl/hermetic:nccl_redist_init_repository.bzl",
+    "@xla//third_party/nccl/hermetic:nccl_redist_init_repository.bzl",
     "nccl_redist_init_repository",
 )
 
 nccl_redist_init_repository()
 
 load(
-    "@org_tensorflow//third_party/nccl/hermetic:nccl_configure.bzl",
+    "@xla//third_party/nccl/hermetic:nccl_configure.bzl",
     "nccl_configure",
 )
 
@@ -222,9 +240,12 @@ load("@org_tensorflow//third_party:repo.bzl", "tf_http_archive", "tf_mirror_urls
 
 tf_http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "e11fd9b963c617de53d08a84f41359164b123f2e8e4180644706688fc9de43d9",
-    strip_prefix = "grpc-1.73.1",
+    sha256 = "dd6a2fa311ba8441bbefd2764c55b99136ff10f7ea42954be96006a2723d33fc",
+    strip_prefix = "grpc-1.74.0",
     #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
+    patch_cmds = [
+        "sed -i 's|X509_STORE_CTX_get0_chain(ctx)|ctx->chain|g' src/core/tsi/ssl_transport_security.cc",
+    ],
     patch_file = [
         "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
         "@org_tensorflow//third_party/grpc:register_go_toolchain.patch",
@@ -238,7 +259,7 @@ tf_http_archive(
         "@org_tensorflow//third_party/systemlibs:grpc.bazel.generate_cc.bzl": "bazel/generate_cc.bzl",
         "@org_tensorflow//third_party/systemlibs:grpc.bazel.protobuf.bzl": "bazel/protobuf.bzl",
     },
-    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.73.1.tar.gz")
+    urls = tf_mirror_urls("https://github.com/grpc/grpc/archive/refs/tags/v1.74.0.tar.gz")
 )
 
 http_archive(
@@ -709,6 +730,7 @@ http_archive(
     build_file = "//third_party:liborc.BUILD",
     patch_cmds = [
         "tar -xzf c++/libs/libhdfspp/libhdfspp.tar.gz -C c++/libs/libhdfspp",
+        "find c++/src -type f \\( -name '*.cc' -o -name '*.hh' -o -name '*.h' \\) -exec sed -i 's|google::protobuf::int64|int64_t|g' {} +",
     ],
     sha256 = "39d983f4c7feb8ea1e8ab8e3e53e9afc643282b7a500b3a93c91aa6490f65c17",
     strip_prefix = "orc-rel-release-1.6.14",
@@ -729,7 +751,7 @@ http_archive(
 )
 
 http_archive(
-    name = "libwebp",
+    name = "custom_libwebp",
     build_file = "//third_party:libwebp.BUILD",
     sha256 = "01bcde6a40a602294994050b81df379d71c40b7e39c819c024d079b3c56307f4",
     strip_prefix = "libwebp-1.2.1",
@@ -878,6 +900,10 @@ http_archive(
 http_archive(
     name = "pulsar",
     build_file = "//third_party:pulsar.BUILD",
+    patch_cmds = [
+        "sed -i 's|descriptor->full_name()|std::string(descriptor->full_name())|g' lib/ProtobufNativeSchema.cc",
+        "sed -i 's|fileDescriptor->name()|std::string(fileDescriptor->name())|g' lib/ProtobufNativeSchema.cc",
+    ],
     sha256 = "be97723dbba43045506f877cbc7600d2efe74264eace980933ae42b387069bc3",
     strip_prefix = "pulsar-client-cpp-3.3.0",
     urls = [
@@ -973,7 +999,7 @@ http_archive(
 )
 
 http_archive(
-    name = "xz",
+    name = "custom_xz",
     build_file = "//third_party:xz.BUILD",
     sha256 = "0d2b89629f13dd1a0602810529327195eff5f62a0142ccd65b903bc16a4ac78a",
     strip_prefix = "xz-5.2.5",
@@ -1078,3 +1104,5 @@ tf_http_archive(
     system_build_file = "@org_tensorflow//third_party/systemlibs:jsoncpp.BUILD",
     urls = tf_mirror_urls("https://github.com/open-source-parsers/jsoncpp/archive/1.9.5.tar.gz"),
 )
+
+
