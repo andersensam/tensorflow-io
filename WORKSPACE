@@ -244,7 +244,7 @@ tf_http_archive(
     strip_prefix = "grpc-1.74.0",
     #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
     patch_cmds = [
-        "sed -i 's|X509_STORE_CTX_get0_chain(ctx)|ctx->chain|g' src/core/tsi/ssl_transport_security.cc",
+        "perl -pi -e 's|X509_STORE_CTX_get0_chain\\(ctx\\)|ctx->chain|g' src/core/tsi/ssl_transport_security.cc",
     ],
     patch_file = [
         "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
@@ -730,7 +730,7 @@ http_archive(
     build_file = "//third_party:liborc.BUILD",
     patch_cmds = [
         "tar -xzf c++/libs/libhdfspp/libhdfspp.tar.gz -C c++/libs/libhdfspp",
-        "find c++/src -type f \\( -name '*.cc' -o -name '*.hh' -o -name '*.h' \\) -exec sed -i 's|google::protobuf::int64|int64_t|g' {} +",
+        "find c++/src -type f \\( -name '*.cc' -o -name '*.hh' -o -name '*.h' \\) -exec perl -pi -e 's|google::protobuf::int64|int64_t|g' {} +",
     ],
     sha256 = "39d983f4c7feb8ea1e8ab8e3e53e9afc643282b7a500b3a93c91aa6490f65c17",
     strip_prefix = "orc-rel-release-1.6.14",
@@ -901,8 +901,8 @@ http_archive(
     name = "pulsar",
     build_file = "//third_party:pulsar.BUILD",
     patch_cmds = [
-        "sed -i 's|descriptor->full_name()|std::string(descriptor->full_name())|g' lib/ProtobufNativeSchema.cc",
-        "sed -i 's|fileDescriptor->name()|std::string(fileDescriptor->name())|g' lib/ProtobufNativeSchema.cc",
+        "perl -pi -e 's|descriptor->full_name\\(\\)|std::string\\(descriptor->full_name\\(\\)\\)|g' lib/ProtobufNativeSchema.cc",
+        "perl -pi -e 's|fileDescriptor->name\\(\\)|std::string\\(fileDescriptor->name\\(\\)\\)|g' lib/ProtobufNativeSchema.cc",
     ],
     sha256 = "be97723dbba43045506f877cbc7600d2efe74264eace980933ae42b387069bc3",
     strip_prefix = "pulsar-client-cpp-3.3.0",
