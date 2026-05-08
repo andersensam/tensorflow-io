@@ -1,3 +1,4 @@
+common --noenable_bzlmod
 build --copt="-fvisibility=hidden"
 build --copt="-D_GLIBCXX_USE_CXX11_ABI=0"
 build --copt="-DEIGEN_MAX_ALIGN_BYTES=64"
@@ -7,11 +8,20 @@ build --action_env TF_SHARED_LIBRARY_NAME="libtensorflow_framework.2.dylib"
 build --cxxopt="-std=c++17"
 build --experimental_repo_remote_exec
 build --enable_platform_specific_config
+build --copt="-Wno-deprecated-declarations"
+build --copt="-Wno-thread-safety-analysis"
+build --copt="-Wno-self-assign"
+build --copt="-Wno-sometimes-uninitialized"
+build --copt="-Wno-incompatible-pointer-types-discards-qualifiers"
+build --copt="-Wno-unused-variable"
+build --copt="-Wno-unused-function"
+build --copt="-Wno-unused-but-set-variable"
+build --copt="-Wno-format-extra-args"
 build:macos --copt="-DGRPC_BAZEL_BUILD"
 build:macos --copt="-D_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION"
-build:macos --action_env MACOSX_DEPLOYMENT_TARGET=12.0
+build:macos --copt="-DHAVE_STRCHRNUL"
+build:macos --action_env MACOSX_DEPLOYMENT_TARGET=11.0
 build:macos --define=grpc_no_ares=true
-build:macos --copt=-Wno-traditional
 build --repo_env HERMETIC_PYTHON_VERSION=3.12
 build:windows --copt="/Zc:preprocessor"
 build:windows --copt="/std:c++17"
@@ -26,3 +36,8 @@ build --test_output=errors
 build --experimental_ui_max_stdouterr_bytes=-1
 build:cache --remote_cache=https://storage.googleapis.com/tensorflow-sigs-io
 build:cache --remote_upload_local_results=false
+build --per_file_copt="third_party/.*,external/.*@-Wno-error"
+build --per_file_copt="third_party/.*,external/.*@-Wno-implicit-function-declaration"
+build --per_file_copt="third_party/.*,external/.*@-Wno-int-conversion"
+build --per_file_copt="third_party/.*,external/.*@-Wno-enum-constexpr-conversion"
+build --per_file_copt="third_party/.*,external/.*@-Wno-private-header"
