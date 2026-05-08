@@ -93,6 +93,9 @@ cc_library(
         "@bazel_tools//src/conditions:windows": [
             ":libtensorflow_framework.so",
         ],
+        "@bazel_tools//src/conditions:darwin": [
+            ":libtensorflow_framework.so",
+        ],
         "//conditions:default": [
             ":stub/libtensorflow_framework.so",
         ],

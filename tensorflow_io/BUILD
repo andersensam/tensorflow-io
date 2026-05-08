@@ -11,6 +11,7 @@ cc_binary(
     linkopts = select({
         "@bazel_tools//src/conditions:darwin": [
             "-lresolv",
+            "-liconv",
         ],
         "//conditions:default": [],
     }),
@@ -67,6 +68,13 @@ cc_binary(
 cc_binary(
     name = "python/ops/libtensorflow_io_plugins.so",
     copts = tf_io_copts(),
+    linkopts = select({
+        "@bazel_tools//src/conditions:darwin": [
+            "-lresolv",
+            "-liconv",
+        ],
+        "//conditions:default": [],
+    }),
     linkshared = 1,
     deps = select({
         "//tensorflow_io/core:static_build_on": [],

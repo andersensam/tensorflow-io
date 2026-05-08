@@ -4,7 +4,6 @@ load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # Note: zlib is placed earlier as tensorflow's zlib does not include unzip
-
 http_archive(
     name = "zlib",
     build_file = "//third_party:zlib.BUILD",
@@ -245,6 +244,7 @@ tf_http_archive(
     #system_build_file = "@org_tensorflow//third_party/xla/third_party/systemlibs:grpc.BUILD",
     patch_cmds = [
         "perl -pi -e 's|X509_STORE_CTX_get0_chain\\(ctx\\)|ctx->chain|g' src/core/tsi/ssl_transport_security.cc",
+        "perl -pi -e 's|deps\\s*=\\s*\\[|deps = [ \"\\@com_google_absl//absl/log:absl_check\", \"\\@com_google_absl//absl/container:flat_hash_map\", \"\\@com_google_absl//absl/algorithm:container\", \"\\@com_google_absl//absl/container:btree\", |g' src/compiler/BUILD",
     ],
     patch_file = [
         "@org_tensorflow//third_party/grpc:generate_cc_env_fix.patch",
